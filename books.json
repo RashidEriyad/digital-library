@@ -1,0 +1,46 @@
+[
+  {
+    "id": "ruh_al_bayan",
+    "title": "تفسير روح البيان",
+    "titleMl": "തഫ്സീർ റൂഹുൽ ബയാൻ",
+    "author": "ഇസ്മായിൽ ഹഖി അൽ ബറൂസവി",
+    "lang": "arabic",
+    "parts": 10,
+    "cover": "📖",
+    "folder": "ruh_al_bayan",
+    "description": "വിശുദ്ധ ഖുർആനിന്റെ അഗാധമായ അർത്ഥതലങ്ങൾ വെളിപ്പെടുത്തുന്ന തഫ്സീർ"
+  },
+  {
+    "id": "fathul_mueen",
+    "title": "فتح المعين",
+    "titleMl": "ഫത്ഹുൽ മുഈൻ",
+    "author": "സൈനുദ്ദീൻ മഖ്ദൂം റളിയള്ളാഹു അൻഹു",
+    "lang": "arabic",
+    "parts": 5,
+    "cover": "📕",
+    "folder": "fathul_mueen",
+    "description": "ശാഫിഈ മദ്ഹബിലെ പ്രമുഖ ഫിഖ്ഹ് ഗ്രന്ഥം"
+  },
+  {
+    "id": "ihya_ulumuddin",
+    "title": "إحياء علوم الدين",
+    "titleMl": "ഇഹ്യാഉ ഉലൂമിദ്ദീൻ",
+    "author": "ഇമാം ഗസ്സാലി റഹിമഹുല്ലാഹ്",
+    "lang": "arabic",
+    "parts": 8,
+    "cover": "📗",
+    "folder": "ihya_ulumuddin",
+    "description": "ആത്മീയ ജ്ഞാനത്തിന്റെ വിജ്ഞാനകോശം"
+  },
+  {
+    "id": "al_kamil_fe_thareeq",
+    "title": "الكبير في التاريخ",
+    "titleMl": "തരീക ",
+    "author": " ഇബ്നു അസീർ  ",
+    "lang": "arabic",
+    "parts": 10,
+    "cover": "📘",
+    "folder": "al_kamil_fe_thareeq",
+    "description": " ചരിത്ര സമാഹാരം"
+  }
+]

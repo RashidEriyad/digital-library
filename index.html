@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Adventure Digital Library Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Manjari:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ================================================================
+       ROOT VARIABLES & THEMES
+       ================================================================ */
+    :root {
+      --primary-green: #1b4d3e; 
+      --bg: #f4f7f6; 
+      --card-bg: #ffffff;
+      --text-dark: #2c3e50; 
+      --accent: #27ae60; 
+      --shadow: 0 4px 15px rgba(0,0,0,0.06);
+      --font-ar: 'Amiri', serif;
+      --font-ml: 'Manjari', sans-serif;
+      --surface: #ffffff;
+      --text-muted: #7f8c8d;
+      --primary: #8b5a2b;
+      --primary-dark: #5c3a1a;
+      --primary-light: #f5ece3;
+      --border: #cbd5e1;
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --bottom-nav: 70px;
+      --mini-player: 65px;
+      --font-scale: 18px;
+      --align-mode: justify;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a; --surface: #1e293b; --card-bg: #1e293b;
+      --text-dark: #f8fafc; --text-muted: #94a3b8;
+      --primary: #bb86fc; --primary-dark: #9c27b0;
+      --primary-light: rgba(187,134,252,0.15); --border: #334155;
+    }
+
+    [data-theme="sepia"] {
+      --bg: #e2d9c8; --surface: #f4ecd8; --card-bg: #f4ecd8;
+      --text-dark: #5c4b37; --text-muted: #8c7a65;
+      --primary: #d97706; --primary-dark: #b45309; --border: #d6cbb5;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg); color: var(--text-dark); font-family: var(--font-ml);
+      margin: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+    button, input, select { font-family: inherit; border: none; outline: none; background: transparent; color: inherit; cursor: pointer; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ================================================================
+       LOADER UI
+       ================================================================ */
+    #loader {
+      position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; transition: opacity 0.5s;
+    }
+    #loader.hidden { opacity: 0; pointer-events: none; }
+    .spinner { border: 4px solid var(--border); border-top: 4px solid var(--primary-green); border-radius: 50%; width: 45px; height: 45px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .status { font-size: 16px; font-weight: bold; color: var(--primary-green); }
+    .import-btn { padding: 12px 30px; background: var(--primary-green); color: white; border-radius: 10px; font-weight: bold; transition: 0.2s; cursor: pointer;}
+    .import-btn:active { transform: scale(0.95); }
+
+    /* ================================================================
+       HOME VIEW HEADER & NAVIGATION
+       ================================================================ */
+    #homeView { display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 90px; }
+    header.home-header {
+      background: var(--primary-green); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .home-title { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+    .top-bar .actions i { cursor: pointer; padding: 5px; font-size: 18px; margin-left: 10px; }
+    
+    .tabs { display: flex; justify-content: space-around; background: var(--primary-green); padding-bottom: 5px; }
+    .tab-item { color: #bdc3c7; padding: 10px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
+    .tab-item.active { color: white; border-bottom-color: white; }
+
+    .search-bar { padding: 10px 0; display: none; }
+    .search-bar.show { display: block; }
+    .search-bar input { width: 100%; padding: 10px 16px; border-radius: 25px; border: 2px solid transparent; font-size: 14px; font-family: var(--font-ml); background: rgba(255,255,255,0.2); color: white; }
+    .search-bar input::placeholder { color: #cbd5e1; }
+
+    .container { padding: 15px; max-width: 1000px; margin: auto; width: 100%; }
+    
+    /* ================================================================
+       BOOK CARD GRID SYSTEM
+       ================================================================ */
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .book-card {
+      background: var(--card-bg); border-radius: var(--radius); overflow: hidden;
+      box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; position: relative; cursor: pointer;
+    }
+    .book-card:active { transform: scale(0.98); }
+    .book-cover { width: 100%; height: 200px; object-fit: cover; background: #eee; border-bottom: 1px solid var(--border); }
+    .book-avatar-fallback { width: 100%; height: 200px; background: linear-gradient(135deg, var(--primary-green), #2c3e50); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; }
+    .book-details { padding: 12px; text-align: center; flex-grow: 1; }
+    .book-details h3 { margin: 0; font-size: 15px; color: var(--primary-green); line-height: 1.4; height: 42px; overflow: hidden; }
+    [data-theme="dark"] .book-details h3 { color: var(--primary); }
+    .book-author { font-size: 12px; color: var(--text-muted); margin-top: 5px; height: 32px; overflow: hidden; }
+    .book-parts-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+    .book-footer { display: flex; border-top: 1px solid var(--border); align-items: stretch; }
+    .more-btn { width: 40px; border: none; background: none; color: var(--text-muted); border-right: 1px solid var(--border); cursor: pointer; }
+    .open-btn { flex-grow: 1; border: none; background: none; color: var(--primary-green); font-weight: bold; padding: 12px; cursor: pointer; font-size: 14px; }
+    [data-theme="dark"] .open-btn { color: var(--primary); }
+
+    .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000; border-top: 1px solid var(--border); }
+    .nav-link { text-align: center; color: var(--text-muted); font-size: 12px; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav-link i { font-size: 22px; }
+    .nav-link.active { color: var(--primary-green); font-weight: bold; }
+    [data-theme="dark"] .nav-link.active { color: var(--primary); }
+
+    /* ================================================================
+       READER MODE INTERFACE
+       ================================================================ */
+    #readerView { display: none; flex-direction: column; height: 100%; position: fixed; inset: 0; background: var(--bg); z-index: 2000; }
+    #readerView.show { display: flex; }
+    .reader-header { background: var(--surface); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 1px solid var(--border); min-height: 55px; }
+    .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-dark); padding: 5px; }
+    .reader-title { font-size: 16px; font-weight: bold; flex: 1; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .reader-actions { display: flex; gap: 16px; font-size: 18px; }
+    .reader-actions i { cursor: pointer; color: var(--text-muted); }
+    .reader-actions .active-bm { color: #f59e0b; text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+
+    .reader-content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+    .reader-part-dropdown-container { display: flex; justify-content: center; margin-bottom: 15px; }
+    .reader-part-select { width: 100%; max-width: 400px; padding: 10px; border-radius: 8px; border: 2px solid var(--border); background: var(--surface); color: var(--text-dark); font-weight: bold; font-family: var(--font-ml); }
+
+    .reader-page-card { background: var(--surface); padding: 25px 20px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); min-height: 50vh; }
+    .head-badge { display: table; margin: 0 auto 16px auto; padding: 6px 20px; background: var(--primary-light); color: var(--primary-dark); font-weight: 700; border-radius: 50px; font-size: 13px; border: 1px solid var(--primary); }
+    .ar-content { font-family: var(--font-ar); font-size: calc(var(--font-scale) + 6px); color: #1a5f7a; direction: rtl; line-height: 2.2; font-weight: 700; text-align: right; margin-bottom: 16px; }
+    [data-theme="dark"] .ar-content { color: #81d4fa; }
+    .ml-content { font-size: var(--font-scale); line-height: 2.1; margin-bottom: 12px; }
+    .en-content { font-size: calc(var(--font-scale) - 1px); line-height: 1.9; color: var(--text-muted); font-style: italic; border-top: 1px dashed var(--border); padding-top: 15px; }
+    
+    .word-token { cursor: pointer; transition: 0.15s; padding: 0 2px; border-radius: 4px; display: inline-block; }
+    .word-hl { background: #facc15 !important; color: #000 !important; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 8px rgba(250,204,21,0.5); }
+    [data-theme="dark"] .word-hl { background-color: #f59e0b !important; color: #fff !important; }
+
+    .reader-pagination { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-top: 15px; background: var(--surface); border-radius: 50px; border: 1px solid var(--border); }
+    .reader-pagination button { padding: 8px 18px; border-radius: 30px; background: var(--bg); border: 1px solid var(--border); font-weight: bold; color: var(--text-dark); }
+    .page-num { font-weight: bold; color: var(--primary-green); font-size: 15px; }
+
+    .reader-bottom-nav { position: fixed; bottom: 0; width: 100%; height: var(--bottom-nav); background: var(--surface); display: flex; align-items: center; z-index: 500; border-top: 1px solid var(--border); }
+    .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: bold; gap: 6px; height: 100%; cursor: pointer; }
+    .nav-tab.active { color: var(--primary-green); }
+
+    /* ================================================================
+       MINI PLAYER & AUDIO HUB
+       ================================================================ */
+    .mini-player { position: fixed; bottom: var(--bottom-nav); width: 100%; height: 52px; background: var(--surface); border-top: 1px solid var(--border); display: none; align-items: center; padding: 0 14px; z-index: 1500; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); }
+    .mini-player.show { display: flex; }
+    .mini-details { flex: 1; overflow: hidden; cursor: pointer; }
+    .mini-title { font-weight: bold; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mini-progress { font-size: 10px; color: var(--text-muted); }
+    .mini-controls { display: flex; gap: 14px; font-size: 18px; color: var(--primary-green); align-items: center; }
+
+    .audio-player { background: var(--surface); padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-lg); text-align: center; }
+    .audio-icon { font-size: 60px; color: var(--primary-green); margin-bottom: 15px; }
+    .audio-title-text { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+    .audio-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+    .audio-controls { display: flex; justify-content: center; align-items: center; gap: 25px; }
+    .audio-controls i { font-size: 28px; color: var(--primary-green); cursor: pointer; }
+    .play-big { font-size: 48px !important; background: var(--primary-green); color: white !important; border-radius: 50%; padding: 12px 18px; }
+    .audio-progress { width: 100%; height: 5px; background: var(--border); border-radius: 3px; margin-top: 20px; position: relative; }
+    .progress-bar { height: 100%; background: var(--primary-green); border-radius: 3px; width: 0%; transition: width 0.1s; }
+
+    /* ================================================================
+       CINEMATIC VISUAL VIEWPORT
+       ================================================================ */
+    .visual-mode { position: fixed; inset: 0; z-index: 2500; display: none; background: #000; flex-direction: column; }
+    .visual-mode.show { display: flex; }
+    .visual-video-wrapper { position: absolute; inset: 0; z-index: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .visual-video-wrapper iframe, .visual-video-wrapper video { width: 100vw; height: 100vh; object-fit: cover; pointer-events: none; border: none; }
+    .visual-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); z-index: 2; }
+    
+    .visual-content { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 120px 25px; color: white; text-align: center; }
+    .vis-ar { font-family: var(--font-ar); font-size: 34px; direction: rtl; line-height: 2.2; margin-bottom: 20px; text-shadow: 0 2px 25px rgba(0,0,0,1); color: #81d4fa; }
+    .vis-ml { font-size: 24px; line-height: 2; text-shadow: 0 2px 25px rgba(0,0,0,1); margin-bottom: 15px; }
+    .vis-en { font-size: 20px; font-style: italic; opacity: 0.85; text-shadow: 0 2px 25px rgba(0,0,0,1); }
+
+    .visual-controls { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; z-index: 20; font-size: 26px; color: white; text-shadow: 0 2px 15px rgba(0,0,0,0.9); align-items: center; background: rgba(0,0,0,0.6); padding: 8px 25px; border-radius: 50px; backdrop-filter: blur(5px); }
+    .vis-play { font-size: 36px; color: #38bdf8; }
+    .vis-close-btn { color: #ef4444; }
+    .visual-progress { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 500px; height: 3px; background: rgba(255,255,255,0.3); }
+    .vis-progress-bar { height: 100%; background: #38bdf8; width: 0%; }
+
+    /* ================================================================
+       MODALS & FIXED DRAWERS
+       ================================================================ */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 3000; }
+    .modal-overlay.show { display: block; }
+    
+    .modal-box { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: var(--surface); z-index: 3001; border-radius: 20px 20px 0 0; transition: bottom 0.3s cubic-bezier(0.2,0.8,0.2,1); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
+    .modal-box.show { bottom: 0; }
+    
+    /* Header Freeze (Sticky) */
+    .modal-header { flex-shrink: 0; background: var(--surface); display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); z-index: 10; color: var(--text-dark); font-weight: bold; }
+    .modal-close { font-size: 22px; cursor: pointer; background: none; border: none; color: var(--text-dark); }
+    .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+    .setting-group { margin-bottom: 18px; }
+    .setting-label { display: block; font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg); border-radius: 8px; margin-bottom: 5px; font-size: 14px; border: 1px solid var(--border); }
+    .setting-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-green); }
+    .setting-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-dark); font-family: var(--font-ml); }
+    .setting-group input[type="range"] { width: 100%; accent-color: var(--primary-green); cursor: pointer; }
+    .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .theme-btn { padding: 10px; border: 2px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; font-size: 13px; cursor: pointer; background: var(--bg); color: var(--text-dark);}
+    .theme-btn.active { border-color: var(--primary-green); background: var(--primary-light); color: var(--primary-green); }
+
+    /* ================================================================
+       ADVANCED BREADCRUMB DRILL-DOWN TOC
+       ================================================================ */
+    .toc-breadcrumb { padding: 10px 15px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 13px; font-weight: bold; color: var(--text-muted); flex-shrink: 0; }
+    .toc-breadcrumb span { cursor: pointer; color: var(--primary-green); transition: 0.2s; }
+    .toc-breadcrumb span:hover { text-decoration: underline; }
+    
+    .toc-item { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; color: var(--text-dark); transition: 0.15s; display: flex; flex-direction: column; }
+    .toc-item:active { background: var(--bg); padding-left: 20px; }
+    .toc-item.current { background: var(--primary-light); border-left: 4px solid var(--primary-green); }
+    .toc-badge { display: inline-block; padding: 3px 8px; background: var(--primary-light); color: var(--primary-green); border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 6px; width: fit-content; text-transform: uppercase; }
+    .toc-title-text { font-size: 16px; font-weight: bold; }
+    .toc-translations { font-size: 12px; color: var(--text-muted); margin-top: 5px; font-family: var(--font-ml); }
+
+    .import-zone { text-align: center; padding: 10px 20px; }
+    .import-input-field { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text-dark); }
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <div class="status" id="loadStatus">📚 ഡിജിറ്റൽ ഗ്രന്ഥശേഖരം ലോഡ് ചെയ്യുന്നു...</div>
+    <div class="sub-status" id="loadSubStatus"></div>
+    <div id="manualInjectControls" style="display:none; text-align:center; margin-top:15px; gap:10px;">
+      <button class="import-btn" onclick="document.getElementById('masterFileInput').click()">
+        <i class="fas fa-file-code"></i> 1. Import Setup (books.json)
+      </button>
+    </div>
+    <input type="file" id="masterFileInput" accept=".json" style="display:none;" onchange="handleMasterUpload(event)">
+  </div>
+
+  <audio id="silentAudio" loop src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA=="></audio>
+  <audio id="ambRain" loop src="https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav"></audio>
+  <audio id="ambWind" loop src="https://assets.mixkit.co/active_storage/sfx/2432/2432-84.wav"></audio>
+  <audio id="ambNasheed" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+  <div id="homeView">
+    <header class="home-header">
+      <div class="top-bar">
+        <div class="logo"><i class="fas fa-layer-group"></i> <span class="home-title">Adventure Library Pro</span></div>
+        <div class="actions">
+          <i class="fas fa-search" onclick="toggleSearch()"></i>
+          <i class="fas fa-cloud-upload-alt" onclick="openImport()"></i>
+        </div>
+      </div>
+      <div class="search-bar" id="searchBar">
+        <input type="text" id="searchInput" placeholder="ഗ്രന്ഥങ്ങൾ തിരയുക (Search books...)" oninput="searchBooks(this.value)">
+      </div>
+      <div class="tabs">
+        <div class="tab-item active" id="tab-all" onclick="filterShelf('all')">All Books</div>
+        <div class="tab-item" id="tab-cats" onclick="filterShelf('categories')">Categories</div>
+        <div class="tab-item" id="tab-auths" onclick="filterShelf('authors')">Authors</div>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="book-grid" id="bookGrid"></div>
+    </div>
+
+    <nav class="bottom-nav">
+      <button class="nav-link active" onclick="goHome()"><i class="fas fa-home"></i>Home</button>
+      <button class="nav-link" onclick="openImport()"><i class="fas fa-folder-plus"></i>Add Book</button>
+      <button class="nav-link" onclick="openSettings()"><i class="fas fa-sliders-h"></i>Settings</button>
+    </nav>
+  </div>
+
+  <div id="readerView">
+    <header class="reader-header">
+      <button class="back-btn" onclick="closeReader()"><i class="fas fa-arrow-left"></i></button>
+      <span class="reader-title" id="readerTitle">Loading Canvas...</span>
+      <div class="reader-actions">
+        <i class="fas fa-bookmark" id="readerBookmark" onclick="toggleBookmark()"></i>
+        <i class="fas fa-list-ol" onclick="openTOC()"></i>
+        <i class="fas fa-cog" onclick="openSettings()"></i>
+      </div>
+    </header>
+
+    <div class="reader-content" id="readerContent">
+      <div class="reader-part-dropdown-container">
+        <select id="partSelectMenu" class="reader-part-select" onchange="switchPart(this.value)"></select>
+      </div>
+
+      <div id="ebookView">
+        <div class="reader-page-card" id="readerPageCard"></div>
+        <div class="reader-pagination">
+          <button onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Prev</button>
+          <span class="page-num" id="readerPageNum">0 / 0</span>
+          <button onclick="changePage(1)">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div id="audioView" style="display:none;">
+        <div class="audio-player">
+          <div class="audio-icon"><i class="fas fa-headphones-simple"></i></div>
+          <div class="audio-title-text" id="audioTitle">Audio Mode</div>
+          <div class="audio-meta" id="audioMeta">Page 0 / 0</div>
+          <div class="audio-controls">
+            <i class="fas fa-backward-step" onclick="changePage(-1)"></i>
+            <i class="fas fa-play play-big" id="audioPlayBtn" onclick="togglePlay()"></i>
+            <i class="fas fa-forward-step" onclick="changePage(1)"></i>
+            <i class="fas fa-stop-circle" onclick="stopAudio()"></i>
+          </div>
+          <div class="audio-progress"><div class="progress-bar" id="audioProgressBar"></div></div>
+        </div>
+      </div>
+
+      <div id="visualView" style="display:none;">
+        <div style="text-align:center; padding:40px; color:var(--text-muted);">
+          <i class="fas fa-wand-magic-sparkles" style="font-size:48px; color:var(--primary-green);"></i>
+          <p style="margin-top:15px; font-weight:bold;">Cinematic Reels View Active</p>
+          <button onclick="openVisualMode()" class="import-btn" style="background:var(--primary-green); border-radius:30px;"><i class="fas fa-eye"></i> Launch Visual Screen</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="reader-bottom-nav">
+      <div class="nav-tab active" id="nav-ebook" onclick="switchViewportTab('ebook')"><i class="fas fa-book"></i><span>E-Book</span></div>
+      <div class="nav-tab" id="nav-audio" onclick="switchViewportTab('audio')"><i class="fas fa-headphones"></i><span>Audio</span></div>
+      <div class="nav-tab" id="nav-visual" onclick="switchViewportTab('visual')"><i class="fas fa-video"></i><span>Visual</span></div>
+    </nav>
+  </div>
+
+  <div class="mini-player" id="miniPlayer">
+    <div class="mini-details" onclick="switchViewportTab('audio')">
+      <div class="mini-title" id="miniTitle">Ready Track</div>
+      <div class="mini-progress" id="miniProgress">Part 0 - Page 0</div>
+    </div>
+    <div class="mini-controls">
+      <i class="fas fa-backward" onclick="changePage(-1)"></i>
+      <i class="fas fa-play" id="miniPlayIcon" onclick="togglePlay()"></i>
+      <i class="fas fa-forward" onclick="changePage(1)"></i>
+    </div>
+  </div>
+
+  <div class="visual-mode" id="visualMode">
+    <div class="visual-video-wrapper" id="visualVideoWrapper">
+      <video id="visualVideo" muted loop playsinline></video>
+      <iframe id="visualYoutube" src="" allow="autoplay; fullscreen; encrypted-media;" playsinline></iframe>
+    </div>
+    <div class="visual-overlay"></div>
+
+    <div class="visual-controls" id="visualControls">
+      <i class="fas fa-backward-step" onclick="changeVisualPage(-1)"></i>
+      <i class="fas fa-play vis-play" id="visPlayBtn" onclick="toggleVisualPlay()"></i>
+      <i class="fas fa-forward-step" onclick="changeVisualPage(1)"></i>
+      <i class="fas fa-stop" onclick="stopVisualAudio()"></i>
+      <i class="fas fa-times-circle vis-close-btn" onclick="closeVisualMode()"></i>
+    </div>
+
+    <div class="visual-content">
+      <div class="vis-ar" id="visArText">...</div>
+      <div class="vis-ml" id="visMlText">...</div>
+      <div class="vis-en" id="visEnText">...</div>
+    </div>
+    <div class="visual-progress"><div class="vis-progress-bar" id="visProgressBar"></div></div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+
+  <div class="modal-box" id="settingsModal">
+    <div class="modal-header">
+      <span>⚙️ സിസ്റ്റം ക്രമീകരണങ്ങൾ</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-group">
+        <label class="setting-label">🎙️ TTS Voice Control & Language Channel</label>
+        <select id="optAudioLang" onchange="setupVoices(); applyAudioSettings(true);" style="margin-bottom:10px;">
+          <option value="ml-IN" selected>മലയാളം (Malayalam)</option>
+          <option value="ar-EG">അറബിക് (Arabic)</option>
+          <option value="en-US">ഇംഗ്ലീഷ് (English)</option>
+        </select>
+        <label class="setting-label">👤 Active Speech Synthesizer</label>
+        <select id="optVoice" onchange="applyAudioSettings(true)"></select>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">📏 Speech Speed Velocity</label>
+        <input type="range" id="optSpeed" min="0.5" max="1.5" step="0.1" value="1.0" onchange="applyAudioSettings(true)">
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">📖 Display Core Layers</label>
+        <div class="setting-row"><span>അറബിക് വരികൾ (Arabic)</span><input type="checkbox" id="optShowAr" checked onchange="renderAllViews()"></div>
+        <div class="setting-row"><span>മലയാളം പരിഭാഷ (Malayalam)</span><input type="checkbox" id="optShowMl" checked onchange="renderAllViews()"></div>
+        <div class="setting-row"><span>ഇംഗ്ലീഷ് വിവരണം (English)</span><input type="checkbox" id="optShowEn" checked onchange="renderAllViews()"></div>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">📏 Global Font Scale Range</label>
+        <input type="range" id="optFontSize" min="14" max="30" value="18" onchange="applyFontSize()">
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">🎨 Interface Theme Matrix</label>
+        <div class="theme-grid">
+          <div class="theme-btn active" id="th-light" onclick="setTheme('light')">☀️ Light</div>
+          <div class="theme-btn" id="th-dark" onclick="setTheme('dark')">🌙 Dark</div>
+          <div class="theme-btn" id="th-sepia" onclick="setTheme('sepia')">📜 Sepia</div>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">🎵 Ambient Sound Multi-Mixer</label>
+        <select id="optAmbient" onchange="handleAmbient()">
+          <option value="none" selected>🔇 ഓഫാക്കുക</option>
+          <option value="rain">🌧️ മഴ (Rain Sound)</option>
+          <option value="wind">🍃 കാറ്റ് (Wind Breeze)</option>
+          <option value="nasheed">🎵 ഇസ്ലാമിക് നഷീദ് (Background Nasheed)</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <div class="setting-row"><span><b>🔄 Auto Page Navigation Link</b></span><input type="checkbox" id="optAutoNext" checked></div>
+        <div class="setting-row"><span><b>🔊 Click Token to Speak Word</b></span><input type="checkbox" id="optTouchSpeak" checked></div>
+      </div>
+      <div class="setting-group">
+        <label class="setting-label">🎬 YouTube Reel Stream ID/URL</label>
+        <input type="text" id="optYoutubeId" placeholder="e.g. dQw4w9WgXcQ അല്ലെങ്കിൽ പൂർണ്ണ ലിങ്ക്" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-dark);">
+        <button class="import-btn" style="width:100%; margin-top:5px; padding:8px;" onclick="applyVisualBg()">Update Video Hook</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-box" id="tocModal" style="padding:0;">
+    <div class="modal-header">
+      <span>📑 വിപുലമായ സൂചിക (Advanced Index)</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="toc-breadcrumb" id="tocBreadcrumb"></div>
+    <div class="modal-body" id="tocList" style="padding:0;"></div>
+  </div>
+
+  <div class="modal-box" id="importModal">
+    <div class="modal-header">
+      <span>📂 സ്മാർട്ട് ഫയൽ ഇൻജെക്ടർ</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="import-zone">
+        <i class="fas fa-server" style="font-size:45px; color:var(--primary-green); margin-bottom:10px;"></i>
+        <h3>IndexedDB Storage Sandbox</h3>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">books.json ലിസ്റ്റിലുള്ള പുസ്തകത്തിലേക്ക് ഭാഗങ്ങൾ ഇൻജെക്ട് ചെയ്യാം</p>
+        
+        <div class="setting-group" style="text-align:left;">
+          <label class="setting-label">1. ടാർഗെറ്റ് പുസ്തകം തിരഞ്ഞെടുക്കുക</label>
+          <select id="injectorTargetBookSelect" style="margin-bottom:15px;"></select>
+          
+          <label class="setting-label">2. ഭാഗങ്ങൾ അപ്‌ലോഡ് ചെയ്യുക (Select Part JSON Files)</label>
+          <input type="file" id="bulkPartsFileInput" accept=".json" multiple onchange="handleBulkPartsUpload(event)" class="import-input-field">
+        </div>
+        
+        <div style="border-top:1px dashed var(--border); margin-top:15px; padding-top:15px;">
+          <button class="import-btn" style="width:100%; background:#7f8c8d;" onclick="document.getElementById('masterFileInput').click()">
+            <i class="fas fa-cog"></i> പുതിയ books.json മാസ്റ്റർ അപ്‌ലോഡ് ചെയ്യുക
+          </button>
+        </div>
+        <div id="injectorStatusText" style="margin-top:12px; font-weight:bold; color:var(--accent);"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DB_NAME = "AdventureMultiBookStorageEngineDB";
+    const DB_VERSION = 1;
+    const CHUNKS_STORE = "book_chunks";
+    const CATALOG_STORE = "master_catalog";
+
+    const STATE = {
+      books: [], currentBook: null, currentPart: null, currentPage: 0,
+      totalPages: 0, data: [], bookmarks: [], playing: false, theme: 'light',
+      mode: 'ebook', fontScale: 18, showAr: true, showMl: true, showEn: true,
+      ttsLang: 'ml-IN', speed: 1.0, autoNext: true, touchSpeak: true,
+      currentBookId: null, visualYoutubeId: '', charOffset: 0, shelfFilter: 'all'
+    };
+
+    let systemVoices = [];
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+    let partMap = {};
+    let audioProgressInterval = null;
+    
+    // TOC Drill-down state
+    let tocTree = [];
+    let tocPath = []; // Array of objects { title: string, nodes: array }
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        let request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+          let db = e.target.result;
+          if (!db.objectStoreNames.contains(CHUNKS_STORE)) db.createObjectStore(CHUNKS_STORE, { keyPath: "uid" });
+          if (!db.objectStoreNames.contains(CATALOG_STORE)) db.createObjectStore(CATALOG_STORE, { keyPath: "id" });
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function loadCatalogFromDB() {
+      let db = await openDB();
+      return new Promise((resolve) => {
+        let tx = db.transaction(CATALOG_STORE, "readonly");
+        let store = tx.objectStore(CATALOG_STORE);
+        let req = store.getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
+      });
+    }
+
+    async function saveCatalogToDB(catalogArray) {
+      let db = await openDB();
+      let tx = db.transaction(CATALOG_STORE, "readwrite");
+      let store = tx.objectStore(CATALOG_STORE);
+      catalogArray.forEach(item => store.put(item));
+    }
+
+    async function getIsolatedBookData(bookId) {
+      let db = await openDB();
+      return new Promise((resolve) => {
+        let tx = db.transaction(CHUNKS_STORE, "readonly");
+        let store = tx.objectStore(CHUNKS_STORE);
+        let req = store.getAll();
+        req.onsuccess = () => {
+          let filtered = req.result.filter(item => item.uid.startsWith(bookId + "_"));
+          resolve(filtered);
+        };
+      });
+    }
+
+    async function saveIsolatedBookData(booksArray) {
+      let db = await openDB();
+      let tx = db.transaction(CHUNKS_STORE, "readwrite");
+      let store = tx.objectStore(CHUNKS_STORE);
+      booksArray.forEach(item => store.put(item));
+    }
+
+    /* =======================================================================
+       INITIALIZATION PIPELINES
+       ======================================================================= */
+    document.addEventListener('DOMContentLoaded', async () => {
+      loadPreferences();
+      setupVoices();
+      if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = setupVoices;
+      window.addEventListener("resize", adjustVideoScale);
+      setupMediaSession();
+      
+      STATE.books = await loadCatalogFromDB();
+      if(STATE.books && STATE.books.length > 0) {
+        renderBooks(STATE.books);
+        populateInjectorOptions();
+        document.getElementById('loader').classList.add('hidden');
+      } else {
+        loadLibrary();
+      }
+    });
+
+    async function loadLibrary() {
+      try {
+        const response = await fetch('books.json');
+        const data = await response.json();
+        if (data && data.length > 0) {
+          STATE.books = data;
+          await saveCatalogToDB(data);
+          renderBooks(data);
+          populateInjectorOptions();
+          document.getElementById('loader').classList.add('hidden');
+        } else { showImportScreen(); }
+      } catch (err) { showImportScreen(); }
+    }
+
+    function showImportScreen() {
+      document.getElementById('loadStatus').textContent = '📂 books.json മാസ്റ്റർ ലിസ്റ്റ് കണ്ടെത്താനായില്ല';
+      document.getElementById('manualInjectControls').style.display = 'block';
+    }
+
+    function populateInjectorOptions() {
+      const select = document.getElementById('injectorTargetBookSelect'); if(!select) return;
+      select.innerHTML = STATE.books.map(b => `<option value="${b.id}">${b.titleMl} (${b.id})</option>`).join('');
+    }
+
+    /* Strict Rule: Only accept books.json */
+    async function handleMasterUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      if (file.name !== 'books.json') { alert("books.json ഫയൽ മാത്രമേ മാസ്റ്റർ ഫയൽ ആയി അപ്‌ലോഡ് ചെയ്യാൻ പാടുള്ളൂ!"); return; }
+      
+      const text = await file.text();
+      try {
+        const parsed = JSON.parse(text);
+        STATE.books = parsed; await saveCatalogToDB(parsed);
+        renderBooks(parsed); populateInjectorOptions();
+        document.getElementById('loader').classList.add('hidden');
+        alert("✅ books.json വിജയകരമായി സിങ്ക് ചെയ്തു!");
+      } catch(err) { alert("Invalid JSON file"); }
+    }
+
+    // MULTIPLE PARTS CHUNKS BULK INJECTOR
+    async function handleBulkPartsUpload(e) {
+      const files = e.target.files; if (!files.length) return;
+      const targetBookId = document.getElementById('injectorTargetBookSelect').value;
+      const statusText = document.getElementById('injectorStatusText');
+      statusText.innerText = "ഡാറ്റാബേസ് ലോക്ക് ചെയ്യുന്നു...";
+      
+      let count = 0;
+      for (let file of files) {
+        const text = await file.text();
+        try {
+          const rawData = JSON.parse(text);
+          if(rawData.length > 0) {
+            let processed = parseIncomingPayload(rawData, targetBookId);
+            await saveIsolatedBookData(processed);
+            count++;
+          }
+        } catch(ex) {}
+      }
+      statusText.innerText = `✅ ${count} ഭാഗങ്ങൾ വിജയകരമായി അപ്‌ലോഡ് ചെയ്തു!`;
+      setTimeout(() => { statusText.innerText = ""; closeModal(); }, 2000);
+      if(STATE.currentBookId === targetBookId) openBook(targetBookId);
+    }
+
+    function parseIncomingPayload(dataArray, bookId) {
+      let list = [];
+      for(let i = 0; i < dataArray.length; i++) {
+        let id = dataArray[i].id;
+        let part = dataArray[i].part || "";
+        let page = dataArray[i].page || "";
+        let ar = (dataArray[i].ar || "").toString().trim();
+        let ml = (dataArray[i].ml || "").toString().trim();
+        let en = (dataArray[i].en || "").toString().trim();
+        
+        let plainAr = ar.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        let plainMl = ml.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        let plainEn = en.replace(/<\/?[^>]+(>|$)/g, "").trim();
+        let uniqueId = bookId + "_bk_" + id;
+        
+        // H ടാഗ് ഡിറ്റക്ഷൻ ലോജിക്
+        let hMatch = ar.match(/<(h[1-6])[^>]*>(.*?)<\/\1>/i);
+        let isHead = !!hMatch;
+        let headingAr = hMatch ? hMatch[2].replace(/<[^>]+>/g, "").trim() : "";
+        let hTagLevel = hMatch ? hMatch[1].toLowerCase() : "";
+
+        // JSON id കൃത്യമായി സംരക്ഷിക്കുന്നു
+        list.push({
+          id: id, rowId: id, sheetId: id, uid: uniqueId, part: part, page: page,
+          arStr: ar, mlStr: ml, enStr: en, isHead: isHead, headingAr: headingAr,
+          hTagLevel: hTagLevel, arPure: plainAr, mlPure: plainMl, enPure: plainEn
+        });
+      }
+      return list;
+    }
+
+    /* =======================================================================
+       CORE HOME SHELF INTERACTION MATRICES
+       ======================================================================= */
+    function renderBooks(books) {
+      const grid = document.getElementById('bookGrid');
+      if (!books || books.length === 0) { grid.innerHTML = `<div class="empty-state"><h3>ഗ്രന്ഥങ്ങൾ ലഭ്യമല്ല</h3></div>`; return; }
+      
+      grid.innerHTML = books.map(book => `
+        <div class="book-card" onclick="openBook('${book.id}')">
+          <span class="book-parts-badge">${book.parts || 0} Parts</span>
+          <div class="book-cover-wrapper">
+            ${book.cover && book.cover.startsWith('http') ? `<img src="${book.cover}" class="book-cover">` : `<div class="book-avatar-fallback">${book.cover || '📖'}</div>`}
+          </div>
+          <div class="book-details">
+            <h3 dir="rtl">${book.title}</h3>
+            <div class="book-author">${book.author || 'Unknown'}</div>
+          </div>
+          <div class="book-footer">
+            <button class="more-btn" onclick="event.stopPropagation(); alert('${book.description || ''}')"><i class="fas fa-info-circle"></i></button>
+            <button class="open-btn" onclick="event.stopPropagation();openBook('${book.id}')">Open</button>
+          </div>
+        </div>`).join("");
+    }
+
+    function filterShelf(type) {
+      document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + (type === 'all' ? 'all' : (type === 'categories' ? 'cats' : 'auths'))).classList.add('active');
+      STATE.shelfFilter = type;
+      
+      if(type === 'all') {
+        renderBooks(STATE.books);
+      } else if(type === 'categories') {
+        let cats = {};
+        STATE.books.forEach(b => { let c = b.lang || "General"; if(!cats[c]) cats[c]=[]; cats[c].push(b); });
+        renderGroupedShelf(cats);
+      } else if(type === 'authors') {
+        let auths = {};
+        STATE.books.forEach(b => { let a = b.author || "Unknown Authors"; if(!auths[a]) auths[a]=[]; auths[a].push(b); });
+        renderGroupedShelf(auths);
+      }
+    }
+
+    function renderGroupedShelf(groupedObj) {
+      const grid = document.getElementById('bookGrid');
+      let html = "";
+      for(let key in groupedObj) {
+        html += `<div style="grid-column: 1/-1; margin-top:15px; padding:8px; background:var(--primary-light); border-radius:6px; font-weight:bold; color:var(--primary-green); text-transform: capitalize;"><i class="fas fa-folder-open"></i> ${key}</div>`;
+        groupedObj[key].forEach(book => {
+          html += `
+            <div class="book-card" onclick="openBook('${book.id}')">
+              <span class="book-parts-badge">${book.parts || 0} Parts</span>
+              <div class="book-cover-wrapper">
+                ${book.cover && book.cover.startsWith('http') ? `<img src="${book.cover}" class="book-cover">` : `<div class="book-avatar-fallback">${book.cover || '📖'}</div>`}
+              </div>
+              <div class="book-details"><h3 dir="rtl">${book.title}</h3><div class="book-author">${book.author}</div></div>
+              <div class="book-footer">
+                <button class="more-btn" onclick="event.stopPropagation();"><i class="fas fa-ellipsis-v"></i></button>
+                <button class="open-btn" onclick="event.stopPropagation();openBook('${book.id}')">Open</button>
+              </div>
+            </div>`;
+        });
+      }
+      grid.innerHTML = html;
+    }
+
+    /* =======================================================================
+       RESUME READING SYNC & CORE RENDER LOGIC
+       ======================================================================= */
+    async function openBook(bookId) {
+      const book = STATE.books.find(b => b.id === bookId); if (!book) return;
+      STATE.currentBook = book; STATE.currentBookId = bookId;
+      
+      let localChunks = await getIsolatedBookData(bookId);
+      if (localChunks && localChunks.length > 0) {
+        localChunks.sort((a, b) => a.id - b.id); compileBookCollections(localChunks, bookId);
+      } else {
+        try {
+          const response = await fetch(`Books/${book.folder || bookId}/${book.folder || bookId}_part_1.json`);
+          const rawJson = await response.json();
+          let processedList = parseIncomingPayload(rawJson, bookId);
+          await saveIsolatedBookData(processedList); compileBookCollections(processedList, bookId);
+        } catch(err) { 
+          alert("ഈ പുസ്തകത്തിന്റെ ഫയലുകൾ ലഭ്യമല്ല. ഡാറ്റ ഇൻജെക്ട് ചെയ്യുക."); 
+          openImport();
+        }
+      }
+    }
+
+    function compileBookCollections(list, bookId) {
+      STATE.data = list; STATE.totalPages = list.length; 
+      
+      // RESUME READING: Load stored exact state
+      STATE.currentPage = parseInt(localStorage.getItem(bookId + '_index')) || 0;
+      STATE.charOffset = parseInt(localStorage.getItem(bookId + '_offset')) || 0;
+      if (STATE.currentPage >= STATE.totalPages) STATE.currentPage = 0;
+
+      openReader();
+    }
+
+    function openReader() {
+      document.getElementById('readerView').classList.add('show');
+      document.getElementById('homeView').style.display = 'none';
+      document.getElementById('readerTitle').textContent = STATE.currentBook.titleMl || STATE.currentBook.title;
+      partMap = {};
+      STATE.data.forEach(item => { if (!partMap[item.part]) partMap[item.part] = []; partMap[item.part].push(item); });
+      
+      renderPartDropdown(); renderPage(); updateBookmarkUI();
+      document.getElementById('miniPlayer').classList.add('show');
+      switchViewportTab('ebook');
+    }
+
+    function closeReader() {
+      stopAudio(); document.getElementById('readerView').classList.remove('show');
+      document.getElementById('homeView').style.display = 'flex';
+      document.getElementById('miniPlayer').classList.remove('show'); 
+      closeVisualMode();
+    }
+
+    function saveState() {
+      if(!STATE.currentBookId) return;
+      localStorage.setItem(STATE.currentBookId + '_index', STATE.currentPage);
+      localStorage.setItem(STATE.currentBookId + '_offset', STATE.charOffset);
+    }
+
+    // Uninterrupted Audio: Visual ൽ നിന്ന് മാറുമ്പോൾ ഓഡിയോ കട്ട് ആവാതിരിക്കാൻ
+    function switchViewportTab(mode) {
+      STATE.mode = mode;
+      document.getElementById('ebookView').style.display = mode === 'ebook' ? 'block' : 'none';
+      document.getElementById('audioView').style.display = mode === 'audio' ? 'block' : 'none';
+      document.getElementById('visualView').style.display = mode === 'visual' ? 'block' : 'none';
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      let activeTab = document.getElementById('nav-' + mode); if(activeTab) activeTab.classList.add('active');
+      
+      if (mode === 'visual') {
+        document.getElementById('visualMode').classList.add('show');
+        updateVisualChunk(); applyVisualBg();
+      } else {
+        // വീഡിയോ മാത്രം നിർത്തുക, ശബ്ദം തുടരും
+        document.getElementById('visualMode').classList.remove('show');
+        document.getElementById('visualVideo').pause();
+        // iframe src ക്ലിയർ ചെയ്യാതിരിക്കുകയാണെങ്കിൽ മെയിൻ ത്രെഡ് ബ്ലോക്ക് ചെയ്യില്ല, എന്നാലും മെമ്മറിക്കായി ഹിഡൻ ആക്കുക.
+        renderPage();
+      }
+    }
+
+    function renderPartDropdown() {
+      const menu = document.getElementById('partSelectMenu'); if(!menu) return;
+      const parts = Object.keys(partMap).sort((a, b) => parseInt(a) - parseInt(b));
+      
+      // സെലക്ട് ചെയ്ത ഭാഗം മെനുവിൽ അപ്ഡേറ്റ് ചെയ്യുക
+      let activePart = STATE.data[STATE.currentPage]?.part || parts[0];
+      STATE.currentPart = activePart;
+      
+      menu.innerHTML = parts.map(part => `<option value="${part}" ${activePart === part ? 'selected' : ''}>📄 Part / ഭാഗം ${part}</option>`).join('');
+    }
+
+    function switchPart(part) {
+      STATE.currentPart = part; const data = partMap[part];
+      if (data) {
+        const firstIndex = STATE.data.indexOf(data[0]);
+        if (firstIndex !== -1) { STATE.currentPage = firstIndex; STATE.charOffset = 0; saveState(); renderPage(); if(STATE.playing) playAudioLine(); }
+      }
+    }
+
+    function renderPage() {
+      if (!STATE.data || STATE.data.length === 0) return;
+      const row = STATE.data[STATE.currentPage]; if (!row) return;
+
+      let html = `<div class="head-badge"> ഭാഗം ${row.part || '?'} - പേജ് ${row.page || '?'}</div>`;
+      if (STATE.showAr && row.arStr) html += `<div class="ar-content">${row.arStr}</div>`;
+      if (STATE.showMl && row.mlStr) html += `<div class="ml-content">${highlightWords(row.mlStr)}</div>`;
+      if (STATE.showEn && row.enStr) html += `<div class="en-content">${row.enStr}</div>`;
+
+      document.getElementById('readerPageCard').innerHTML = html;
+      document.getElementById('readerPageNum').textContent = `${STATE.currentPage + 1} / ${STATE.totalPages}`;
+      document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
+      document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
+      
+      // Update part dropdown silently if part changed via pagination
+      const menu = document.getElementById('partSelectMenu');
+      if (menu && menu.value !== row.part) { menu.value = row.part; STATE.currentPart = row.part; }
+
+      updateAudioUI(); syncHighlights();
+      if (document.getElementById('visualMode').classList.contains('show')) updateVisualChunk();
+    }
+
+    function highlightWords(text) {
+      if (!text) return ''; let offsetAcc = 0;
+      return text.split(/(\s+)/).map(token => {
+        if(token.trim() === "") { offsetAcc += token.length; return token; }
+        let span = `<span class="word-token" id="eb_w_${offsetAcc}" onclick="touchSeek(${offsetAcc})">${token}</span>`;
+        offsetAcc += token.length; return span;
+      }).join('');
+    }
+
+    function touchSeek(offset) {
+      if(!STATE.touchSpeak) return; STATE.charOffset = offset; saveState(); synth.cancel(); STATE.playing = false; togglePlay();
+    }
+
+    function changePage(delta) {
+      const newPage = STATE.currentPage + delta; if (newPage < 0 || newPage >= STATE.totalPages) return;
+      STATE.currentPage = newPage; STATE.charOffset = 0; saveState();
+      renderPage(); document.getElementById('readerContent').scrollTop = 0;
+      if (STATE.playing) playAudioLine();
+    }
+
+    /* =======================================================================
+       STABLE MEDIA VOICE ENGINE
+       ======================================================================= */
+    function setupVoices() {
+      systemVoices = synth.getVoices();
+      let sel = document.getElementById("optVoice"); if(!sel) return;
+      sel.innerHTML = "";
+      let targetLang = document.getElementById("optAudioLang").value;
+      let filteredVoices = systemVoices.filter(v => v.lang.includes(targetLang.split('-')[0]));
+      if(filteredVoices.length === 0 && systemVoices.length > 0) filteredVoices.push(systemVoices[0]);
+      filteredVoices.forEach(v => { sel.appendChild(new Option(`${v.name} (${v.lang})`, v.name)); });
+    }
+
+    function togglePlay() {
+      // മീഡിയ സെഷൻ സിൻക്രോണൈസ് ചെയ്യാൻ സൈലൻ്റ് ട്രാക്ക് ഇവിടെ തന്നെ എനേബിൾ ചെയ്യുക
+      document.getElementById('silentAudio').play().catch(()=>{});
+
+      if (STATE.playing) {
+        synth.pause(); STATE.playing = false; updatePlayIcon();
+        document.getElementById('silentAudio').pause(); handleAmbient();
+      } else {
+        if (synth.paused) { 
+          synth.resume(); STATE.playing = true; updatePlayIcon(); handleAmbient(); 
+        } else { STATE.playing = true; updatePlayIcon(); playAudioLine(); }
+      }
+    }
+
+    function playAudioLine() {
+      const row = STATE.data[STATE.currentPage]; if (!row) return;
+      const audioLangSetting = document.getElementById("optAudioLang").value;
+      
+      let fullText = row.mlStr;
+      if (audioLangSetting === "ml-IN") fullText = row.mlStr;
+      else if (audioLangSetting === "en-US") fullText = row.enStr;
+      else if (audioLangSetting === "ar-EG") fullText = row.arPure;
+
+      if (!fullText) { if (STATE.autoNext) changePage(1); return; }
+      let playableText = fullText.substring(STATE.charOffset);
+      if (playableText.trim() === "") { changePage(1); return; }
+
+      synth.cancel();
+      currentUtterance = new SpeechSynthesisUtterance(playableText);
+      currentUtterance.lang = audioLangSetting;
+      
+      let vName = document.getElementById("optVoice").value;
+      if(vName) currentUtterance.voice = systemVoices.find(v => v.name === vName);
+      currentUtterance.rate = parseFloat(document.getElementById("optSpeed").value) || 1.0;
+
+      let baseCharOffset = STATE.charOffset; const currentPageOnStart = STATE.currentPage;
+
+      if (audioProgressInterval) clearInterval(audioProgressInterval);
+      let progress = 0;
+      audioProgressInterval = setInterval(() => {
+        progress += 0.5; if (progress > 100) progress = 0;
+        if (STATE.mode === 'audio') document.getElementById('audioProgressBar').style.width = progress + '%';
+        document.getElementById('visProgressBar').style.width = progress + '%';
+      }, 100);
+
+      currentUtterance.onstart = () => {
+        document.getElementById('silentAudio').play().catch(()=>{}); handleAmbient(); updateMediaSessionMeta();
+      };
+      
+      currentUtterance.onboundary = (e) => {
+        if(typeof e.charIndex === 'number' && (e.name === 'word' || !e.name)) {
+          STATE.charOffset = baseCharOffset + e.charIndex; saveState();
+          syncHighlights(); updateVisualChunk();
+        }
+      };
+
+      currentUtterance.onend = () => {
+        if (STATE.playing && STATE.autoNext && STATE.currentPage === currentPageOnStart) {
+          changePage(1);
+        }
+      };
+      synth.speak(currentUtterance);
+    }
+
+    function stopAudio() {
+      synth.cancel(); STATE.playing = false; STATE.charOffset = 0; saveState(); updatePlayIcon();
+      if (audioProgressInterval) clearInterval(audioProgressInterval);
+      document.getElementById('audioProgressBar').style.width = '0%';
+      document.getElementById('visProgressBar').style.width = '0%';
+      document.getElementById('silentAudio').pause(); handleAmbient(); syncHighlights();
+    }
+
+    function updatePlayIcon() {
+      const icon = STATE.playing ? 'fa-pause' : 'fa-play';
+      document.getElementById('miniPlayIcon').className = `fas ${icon}`;
+      if (STATE.mode === 'audio') document.getElementById('audioPlayBtn').className = `fas ${icon} play-big`;
+      document.getElementById('visPlayBtn').className = `fas ${icon} vis-play`;
+    }
+
+    function applyAudioSettings(restart) { if(restart && STATE.playing) playAudioLine(); }
+
+    function syncHighlights() {
+      document.querySelectorAll(".word-token").forEach(el => el.classList.remove('word-hl'));
+      let spans = document.querySelectorAll(".word-token"); let targetSpan = null;
+      for(let i=spans.length-1; i>=0; i--) {
+        let spanOffset = parseInt(spans[i].id.replace('eb_w_', ''));
+        if(spanOffset <= STATE.charOffset) { targetSpan = spans[i]; break; }
+      }
+      if(targetSpan) targetSpan.classList.add('word-hl');
+    }
+
+    function updateAudioUI() {
+      const row = STATE.data[STATE.currentPage]; if (!row) return;
+      document.getElementById('audioTitle').textContent = (row.mlPure || '').substring(0, 50) + '...';
+      document.getElementById('audioMeta').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page} / ${STATE.totalPages}`;
+    }
+
+    /* =======================================================================
+       CINEMATIC VISUAL REELS HOOK PIPELINES & YT ERR 153 FIX
+       ======================================================================= */
+    function openVisualMode() {
+      document.getElementById('visualMode').classList.add('show');
+      updateVisualChunk(); applyVisualBg();
+      if (!STATE.playing) { STATE.playing = true; playAudioLine(); updatePlayIcon(); }
+    }
+
+    function closeVisualMode() {
+      document.getElementById('visualMode').classList.remove('show');
+      document.getElementById('visualVideo').pause();
+      document.getElementById('visualYoutube').src = '';
+      renderPage();
+    }
+
+    function updateVisualChunk() {
+      const row = STATE.data[STATE.currentPage]; if (!row) return;
+      const audioLangSetting = document.getElementById("optAudioLang").value;
+      document.getElementById('visArText').innerHTML = generateVisualWords(row.arPure, audioLangSetting === 'ar-EG');
+      document.getElementById('visMlText').innerHTML = generateVisualWords(row.mlPure, audioLangSetting === 'ml-IN');
+      document.getElementById('visEnText').innerHTML = generateVisualWords(row.enPure, audioLangSetting === 'en-US');
+    }
+
+    function generateVisualWords(pureString, isCurrentAudioLang) {
+      if(!pureString) return "...";
+      let tokens = pureString.split(/(\s+)/); let activeTokenIdx = 0; let acc = 0;
+      for(let i=0; i<tokens.length; i++) {
+        if(acc <= STATE.charOffset) activeTokenIdx = i; else break;
+        acc += tokens[i].length;
+      }
+      let html = ""; acc = 0;
+      tokens.forEach((token, idx) => {
+        let isWord = token.trim() !== "";
+        let isHighlight = isCurrentAudioLang && (acc === STATE.charOffset) && isWord;
+        let hlClass = isHighlight ? "word-hl" : "";
+        if(Math.abs(idx - activeTokenIdx) <= 6) {
+          if(isWord) html += `<span class="word-token ${hlClass}">${token}</span>`; else html += token;
+        }
+        acc += token.length;
+      });
+      return html || "...";
+    }
+
+    function toggleVisualPlay() { togglePlay(); }
+    function changeVisualPage(delta) { changePage(delta); }
+    function stopVisualAudio() { stopAudio(); }
+
+    function applyVisualBg() {
+      const ytInput = document.getElementById('optYoutubeId').value.trim();
+      const videoEl = document.getElementById('visualVideo');
+      const youtubeEl = document.getElementById('visualYoutube');
+      let videoId = extractYoutubeId(ytInput);
+
+      // Error 153/150 Fix: Added playsinline, full origin and correct YT API Parameters
+      if (videoId) {
+        videoEl.style.display = 'none'; videoEl.pause(); youtubeEl.style.display = 'block';
+        youtubeEl.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&playsinline=1&showinfo=0&rel=0`;
+      } else {
+        youtubeEl.style.display = 'none'; youtubeEl.src = ''; videoEl.style.display = 'block';
+        videoEl.src = 'https://assets.mixkit.co/videos/preview/mixkit-forest-trees-3524-large.mp4';
+        videoEl.loop = true; videoEl.play().catch(() => {});
+      }
+      adjustVideoScale();
+    }
+
+    function extractYoutubeId(url) {
+      let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      let match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : url;
+    }
+
+    function adjustVideoScale() {
+      const ytIframe = document.getElementById("visualYoutube");
+      const localVideo = document.getElementById("visualVideo");
+      const isPortrait = window.innerHeight > window.innerWidth;
+      const targetScale = isPortrait ? "scale(1.6)" : "scale(1.0)";
+      if(ytIframe) ytIframe.style.transform = targetScale;
+      if(localVideo) localVideo.style.transform = targetScale;
+    }
+
+    /* =======================================================================
+       ADVANCED BREADCRUMB DRILL-DOWN TOC (HIERARCHICAL)
+       ======================================================================= */
+    function openTOC() { 
+      openModal('tocModal'); 
+      buildTOCData();
+      tocPath = [{ title: 'Home', nodes: tocTree }];
+      renderTOCLevel();
+    }
+    
+    function buildTOCData() {
+      tocTree = [];
+      let currentPart = null, currentH1 = null, currentH2 = null;
+
+      STATE.data.forEach((row, index) => {
+        let partName = row.part || "1";
+        if (!currentPart || currentPart.name !== partName) {
+            currentPart = { type: 'part', name: partName, title: `ഭാഗം (Part) ${partName}`, children: [], index: index, page: row.page };
+            tocTree.push(currentPart);
+            currentH1 = null; currentH2 = null;
+        }
+
+        if (row.isHead) {
+            let trMlText = row.mlPure ? row.mlPure.substring(0, 10) : "";
+            let trEnText = row.enPure ? row.enPure.substring(0, 10) : "";
+            let subtitle = (trMlText || trEnText) ? `[ ${trMlText} / ${trEnText} ]` : "";
+            let node = { type: row.hTagLevel, title: row.headingAr, subtitle: subtitle, index: index, children: [], page: row.page, raw: row };
+            
+            if (row.hTagLevel === 'h1') {
+                currentH1 = node; currentPart.children.push(currentH1); currentH2 = null;
+            } else if (row.hTagLevel === 'h2') {
+                currentH2 = node;
+                if (currentH1) currentH1.children.push(currentH2); else currentPart.children.push(currentH2);
+            } else {
+                if (currentH2) currentH2.children.push(node);
+                else if (currentH1) currentH1.children.push(node);
+                else currentPart.children.push(node);
+            }
+        } else if (index % 5 === 0 || index === STATE.currentPage || index === 0 || index === STATE.data.length - 1) {
+            // Push regular reading pages inside the deepest available parent
+            let node = { type: 'page', title: `വായന - പേജ് ${row.page}`, subtitle: row.mlPure.substring(0, 20) + "...", index: index, children: [], page: row.page, raw: row };
+            if (currentH2) currentH2.children.push(node);
+            else if (currentH1) currentH1.children.push(node);
+            else currentPart.children.push(node);
+        }
+      });
+    }
+
+    function renderTOCLevel() {
+      let currentLevel = tocPath[tocPath.length - 1];
+      let breadcrumbHTML = tocPath.map((p, i) => `<span onclick="navTOC(${i})">${p.title}</span>`).join(' <i class="fas fa-angle-right" style="font-size:10px;margin:0 5px;"></i> ');
+      document.getElementById('tocBreadcrumb').innerHTML = breadcrumbHTML;
+
+      let html = currentLevel.nodes.map((node, i) => {
+          if (node.children.length > 0) {
+              return `<div class="toc-item" onclick="drillTOC(${i})">
+                  <div class="toc-badge">${node.type.toUpperCase()}</div>
+                  <div class="toc-title-text" dir="rtl" style="text-align:right; font-size:18px; font-weight:bold; color:var(--primary-green);">${node.title}</div>
+                  ${node.subtitle ? `<div class="toc-translations" dir="ltr" style="text-align:right;">${node.subtitle}</div>` : ''}
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:8px;"><i class="fas fa-folder-open"></i> ${node.children.length} ഉള്ളടക്കങ്ങൾ <i class="fas fa-chevron-right" style="float:right;"></i></div>
+              </div>`;
+          } else {
+              return `<div class="toc-item ${node.index === STATE.currentPage ? 'current' : ''}" onclick="closeModal(); jumpToPage(${node.index})">
+                  <div class="toc-badge">📄 പേജ് ${node.page}</div>
+                  <div class="toc-title-text" ${node.raw && node.raw.isHead ? 'dir="rtl" style="text-align:right;font-size:16px;font-weight:bold;"' : ''}>${node.title}</div>
+                  ${node.subtitle ? `<div class="toc-translations" dir="ltr" ${node.raw && node.raw.isHead ? 'style="text-align:right;"' : ''}>${node.subtitle}</div>` : ''}
+              </div>`;
+          }
+      }).join('');
+      document.getElementById('tocList').innerHTML = html;
+    }
+
+    function drillTOC(indexInCurrentList) {
+      let currentLevel = tocPath[tocPath.length - 1];
+      let node = currentLevel.nodes[indexInCurrentList];
+      let title = node.type === 'part' ? `Part ${node.name}` : (node.subtitle ? node.subtitle.substring(1, 10) + "..." : "Chapter");
+      tocPath.push({ title: title, nodes: node.children });
+      renderTOCLevel();
+    }
+
+    function navTOC(pathIndex) {
+      tocPath = tocPath.slice(0, pathIndex + 1);
+      renderTOCLevel();
+    }
+
+    function jumpToPage(index) { STATE.currentPage = index; STATE.charOffset = 0; saveState(); renderPage(); if(STATE.playing) playAudioLine(); }
+    
+    /* =======================================================================
+       MEDIA INTERACTION UTILITIES & BACKGROUND CONTROLS
+       ====================================================================== */
+    function setupMediaSession() {
+      if('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', togglePlay);
+        navigator.mediaSession.setActionHandler('pause', togglePlay);
+        navigator.mediaSession.setActionHandler('nexttrack', () => changePage(1));
+        navigator.mediaSession.setActionHandler('previoustrack', () => changePage(-1));
+        navigator.mediaSession.setActionHandler('stop', stopAudio);
+      }
+    }
+
+    function updateMediaSessionMeta() {
+      if('mediaSession' in navigator && STATE.currentBook) {
+        let b = STATE.data[STATE.currentPage];
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: STATE.currentBook.title,
+          artist: `ഭാഗം ${b?.part || ''} - പേജ് ${b?.page || ''}`,
+          album: 'Adventure Premium Sandbox'
+        });
+      }
+    }
+
+    function toggleBookmark() {
+      const key = STATE.currentBookId + '_bookmarks'; let bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
+      const idx = bookmarks.indexOf(STATE.currentPage);
+      if (idx > -1) bookmarks.splice(idx, 1); else bookmarks.push(STATE.currentPage);
+      localStorage.setItem(key, JSON.stringify(bookmarks)); updateBookmarkUI();
+    }
+
+    function updateBookmarkUI() {
+      if(!STATE.currentBookId) return;
+      const key = STATE.currentBookId + '_bookmarks'; const bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
+      document.getElementById('readerBookmark').classList.toggle('active-bm', bookmarks.includes(STATE.currentPage));
+    }
+
+    function openImport() { openModal('importModal'); }
+    function openSettings() { openModal('settingsModal'); }
+    function openModal(id) { document.getElementById('modalOverlay').classList.add('show'); document.getElementById(id).classList.add('show'); }
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.querySelectorAll('.modal-box').forEach(el => el.classList.remove('show')); }
+    function goHome() { closeReader(); }
+
+    function setTheme(theme) {
+      STATE.theme = theme; document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('m_rb_theme', theme);
+      document.querySelectorAll('.theme-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('th-' + theme).classList.add('active');
+    }
+
+    function applyFontSize() {
+      const size = document.getElementById('optFontSize').value;
+      document.documentElement.style.setProperty('--font-scale', size + 'px');
+      localStorage.setItem('m_rb_fsize', size); renderPage();
+    }
+
+    function loadPreferences() {
+      setTheme(localStorage.getItem('m_rb_theme') || 'light');
+      document.getElementById('optFontSize').value = localStorage.getItem('m_rb_fsize') || '18';
+      applyFontSize();
+      STATE.showAr = true; STATE.showMl = true; STATE.showEn = true;
+    }
+
+    function renderAllViews() {
+      STATE.showAr = document.getElementById('optShowAr').checked;
+      STATE.showMl = document.getElementById('optShowMl').checked;
+      STATE.showEn = document.getElementById('optShowEn').checked;
+      renderPage();
+    }
+
+    function toggleSearch() { document.getElementById('searchBar').classList.toggle('show'); }
+    
+    function searchBooks(q) {
+      let filtered = STATE.books.filter(b => b.title.toLowerCase().includes(q.toLowerCase()) || b.titleMl.includes(q));
+      renderBooks(filtered);
+    }
+
+    function handleAmbient() {
+      let rain = document.getElementById("ambRain"), wind = document.getElementById("ambWind"), nasheed = document.getElementById("ambNasheed");
+      let opt = document.getElementById("optAmbient").value;
+      rain.pause(); wind.pause(); nasheed.pause();
+      if(STATE.playing) {
+        if(opt === 'rain') rain.play().catch(()=>{});
+        if(opt === 'wind') wind.play().catch(()=>{});
+        if(opt === 'nasheed') { nasheed.volume = 0.15; nasheed.play().catch(()=>{}); }
+      }
+    }
+  </script>
+</body>
+</html>
