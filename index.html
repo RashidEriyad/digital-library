@@ -97,6 +97,28 @@
     .container { padding: 15px; max-width: 1000px; margin: auto; width: 100%; }
     
     /* ================================================================
+       CONTINUE READING CARD
+       ================================================================ */
+    .continue-card {
+      background: var(--primary-light);
+      border: 2px solid var(--primary-green);
+      border-radius: var(--radius);
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: 0.2s;
+      grid-column: 1/-1;
+    }
+    .continue-card:hover { transform: scale(1.01); }
+    .continue-card .info { flex: 1; }
+    .continue-card .info h4 { color: var(--primary-green); font-size: 14px; margin-bottom: 4px; }
+    .continue-card .info p { font-size: 12px; color: var(--text-muted); }
+    .continue-card .btn { background: var(--primary-green); color: white; padding: 8px 20px; border-radius: 30px; font-size: 13px; }
+
+    /* ================================================================
        BOOK CARD GRID SYSTEM & CATEGORY ACCORDION
        ================================================================ */
     .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
@@ -215,7 +237,6 @@
     .modal-box { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: var(--surface); z-index: 3001; border-radius: 20px 20px 0 0; transition: bottom 0.3s cubic-bezier(0.2,0.8,0.2,1); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); }
     .modal-box.show { bottom: 0; }
     
-    /* Header Freeze (Sticky) */
     .modal-header { flex-shrink: 0; background: var(--surface); display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); z-index: 10; color: var(--text-dark); font-weight: bold; }
     .modal-close { font-size: 22px; cursor: pointer; background: none; border: none; color: var(--text-dark); }
     .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
@@ -263,6 +284,10 @@
     <input type="file" id="masterFileInput" accept=".json" style="display:none;" onchange="handleMasterUpload(event)">
   </div>
 
+  <!-- ================================================================
+       WEB AUDIO API - Oscillator for Background Audio Lock
+       ഇത് TTS വോയിസ് കട്ട് ആവാതിരിക്കാൻ സഹായിക്കുന്നു
+       ================================================================ -->
   <audio id="silentAudio" loop playsinline src="https://raw.githubusercontent.com/anars/blank-audio/master/10-minutes-of-silence.mp3"></audio>
   <audio id="ambRain" loop src="https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav"></audio>
   <audio id="ambWind" loop src="https://assets.mixkit.co/active_storage/sfx/2432/2432-84.wav"></audio>
@@ -288,6 +313,15 @@
     </header>
 
     <div class="container">
+      <!-- Continue Reading Card -->
+      <div class="continue-card" id="continueCard" onclick="continueReading()">
+        <div class="info">
+          <h4><i class="fas fa-book-open"></i> Continue Reading</h4>
+          <p id="continueInfo">Loading...</p>
+        </div>
+        <div class="btn"><i class="fas fa-play"></i> Resume</div>
+      </div>
+      
       <div class="book-grid" id="bookGrid"></div>
     </div>
 
@@ -512,12 +546,69 @@
   </div>
 
   <script>
+    // ================================================================
+    // WEB AUDIO API - Oscillator for Background Audio Lock
+    // ഇത് TTS വോയിസ് കട്ട് ആവാതിരിക്കാൻ സഹായിക്കുന്നു
+    // ================================================================
+    
+    let audioCtx = null;
+    let oscillator = null;
+    let gainNode = null;
+    let isAudioContextRunning = false;
+
+    function initAudioContext() {
+      try {
+        // Create Audio Context
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create Oscillator Node (ultrasonic frequency - inaudible)
+        oscillator = audioCtx.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 18000; // 18kHz - almost inaudible
+        
+        // Create Gain Node (volume control)
+        gainNode = audioCtx.createGain();
+        gainNode.gain.value = 0.001; // Very low volume (almost silent)
+        
+        // Connect nodes
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        // Start oscillator
+        oscillator.start();
+        
+        // Resume audio context
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        
+        isAudioContextRunning = true;
+        console.log('✅ Web Audio API initialized for background audio lock');
+      } catch (error) {
+        console.warn('⚠️ Web Audio API not supported:', error);
+      }
+    }
+
+    function resumeAudioContext() {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+        isAudioContextRunning = true;
+      }
+    }
+
+    // Resume audio context on any user interaction
+    document.addEventListener('click', resumeAudioContext);
+    document.addEventListener('touchstart', resumeAudioContext);
+    document.addEventListener('keydown', resumeAudioContext);
+
+    // ================================================================
+    // DATABASE & STATE
+    // ================================================================
     const DB_NAME = "AdventureMultiBookStorageEngineDB";
     const DB_VERSION = 1;
     const CHUNKS_STORE = "book_chunks";
     const CATALOG_STORE = "master_catalog";
 
-    // Separate UI state from Audio background state
     const STATE = {
       books: [], currentBook: null, currentPage: 0,
       totalPages: 0, data: [], bookmarks: [], playing: false, theme: 'light',
@@ -537,8 +628,38 @@
     let touchStartX = 0; let touchEndX = 0;
     
     let tocTree = [];
-    let tocPath = []; 
+    let tocPath = [];
 
+    // ================================================================
+    // CONTINUE READING - Home Page Card
+    // ================================================================
+    function updateContinueReading() {
+      const card = document.getElementById('continueCard');
+      const info = document.getElementById('continueInfo');
+      
+      const lastBookId = localStorage.getItem('last_played_book_id');
+      const lastPage = localStorage.getItem('last_played_page');
+      const lastPart = localStorage.getItem('last_played_part');
+      const lastTitle = localStorage.getItem('last_played_book_title');
+      
+      if (lastBookId && lastPage) {
+        card.style.display = 'flex';
+        info.textContent = `${lastTitle || 'Book'} - ഭാഗം ${lastPart || '1'} - പേജ് ${lastPage}`;
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    function continueReading() {
+      const bookId = localStorage.getItem('last_played_book_id');
+      if (bookId) {
+        openBook(bookId);
+      }
+    }
+
+    // ================================================================
+    // INDEXEDDB FUNCTIONS
+    // ================================================================
     function openDB() {
       return new Promise((resolve, reject) => {
         let request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -590,12 +711,16 @@
       booksArray.forEach(item => store.put(item));
     }
 
-    /* =======================================================================
-       INITIALIZATION PIPELINES & GESTURES
-       ======================================================================= */
+    // ================================================================
+    // INITIALIZATION
+    // ================================================================
     document.addEventListener('DOMContentLoaded', async () => {
       loadPreferences();
       setupVoices();
+      
+      // Initialize Web Audio API on user interaction
+      initAudioContext();
+      
       if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = setupVoices;
       window.addEventListener("resize", adjustVideoScale);
       setupMediaSession();
@@ -606,6 +731,7 @@
         renderBooks(STATE.books);
         populateInjectorOptions();
         document.getElementById('loader').classList.add('hidden');
+        updateContinueReading();
       } else {
         loadLibrary();
       }
@@ -624,8 +750,8 @@
 
     function handleSwipe() {
       const SWIPE_THRESHOLD = 50;
-      if (touchStartX - touchEndX > SWIPE_THRESHOLD) changePage(1); // Swipe left -> Next
-      if (touchEndX - touchStartX > SWIPE_THRESHOLD) changePage(-1); // Swipe right -> Prev
+      if (touchStartX - touchEndX > SWIPE_THRESHOLD) changePage(1);
+      if (touchEndX - touchStartX > SWIPE_THRESHOLD) changePage(-1);
     }
 
     async function loadLibrary() {
@@ -638,6 +764,7 @@
           renderBooks(data);
           populateInjectorOptions();
           document.getElementById('loader').classList.add('hidden');
+          updateContinueReading();
         } else { showImportScreen(); }
       } catch (err) { showImportScreen(); }
     }
@@ -718,9 +845,9 @@
       return list;
     }
 
-    /* =======================================================================
-       CORE HOME SHELF INTERACTION MATRICES
-       ======================================================================= */
+    // ================================================================
+    // RENDER BOOKS
+    // ================================================================
     function renderBooks(books) {
       const grid = document.getElementById('bookGrid');
       if (!books || books.length === 0) { grid.innerHTML = `<div class="empty-state"><h3>ഗ്രന്ഥങ്ങൾ ലഭ്യമല്ല</h3></div>`; return; }
@@ -788,9 +915,9 @@
       grid.innerHTML = html;
     }
 
-    /* =======================================================================
-       RESUME READING SYNC & CORE RENDER LOGIC
-       ======================================================================= */
+    // ================================================================
+    // OPEN BOOK
+    // ================================================================
     async function openBook(bookId) {
       const book = STATE.books.find(b => b.id === bookId); if (!book) return;
       STATE.currentBook = book; STATE.currentBookId = bookId;
@@ -831,13 +958,25 @@
       if(STATE.playing || PLAY_STATE.bookId) {
           document.getElementById('miniPlayer').classList.add('show');
       } else {
-          document.getElementById('miniPlayer').classList.add('show'); // Show it ready to play
+          document.getElementById('miniPlayer').classList.add('show');
       }
       switchViewportTab('ebook');
+      
+      // Resume Web Audio Context
+      resumeAudioContext();
     }
 
     function closeReader() {
-      // do not stop audio when going home
+      // Save last position for Continue Reading
+      if (STATE.currentBookId) {
+        const row = STATE.data[STATE.currentPage];
+        localStorage.setItem('last_played_book_id', STATE.currentBookId);
+        localStorage.setItem('last_played_book_title', STATE.currentBook.titleMl || STATE.currentBook.title);
+        localStorage.setItem('last_played_page', row?.page || '1');
+        localStorage.setItem('last_played_part', row?.part || '1');
+      }
+      
+      // DO NOT stop audio - let it continue playing
       document.getElementById('readerView').classList.remove('show');
       document.getElementById('homeView').style.display = 'flex';
       
@@ -845,12 +984,22 @@
           document.getElementById('miniPlayer').classList.remove('show');
       }
       closeVisualMode();
+      updateContinueReading();
     }
 
     function saveState() {
       if(!STATE.currentBookId) return;
       localStorage.setItem(STATE.currentBookId + '_index', STATE.currentPage);
       localStorage.setItem(STATE.currentBookId + '_offset', STATE.charOffset);
+      
+      const row = STATE.data[STATE.currentPage];
+      if (row) {
+        localStorage.setItem('last_played_book_id', STATE.currentBookId);
+        localStorage.setItem('last_played_book_title', STATE.currentBook.titleMl || STATE.currentBook.title);
+        localStorage.setItem('last_played_page', row.page || '1');
+        localStorage.setItem('last_played_part', row.part || '1');
+      }
+      updateContinueReading();
     }
 
     function switchViewportTab(mode) {
@@ -869,8 +1018,14 @@
         document.getElementById('visualVideo').pause();
         renderPage();
       }
+      
+      // Resume Web Audio Context
+      resumeAudioContext();
     }
 
+    // ================================================================
+    // RENDER PAGE
+    // ================================================================
     function renderPage() {
       if (!STATE.data || STATE.data.length === 0) return;
       const row = STATE.data[STATE.currentPage]; if (!row) return;
@@ -883,7 +1038,6 @@
       document.getElementById('readerPageCard').innerHTML = html;
       document.getElementById('readerPageNum').textContent = `${STATE.currentPage + 1} / ${STATE.totalPages}`;
       
-      // Update UI texts if this is the book currently loaded
       if(!STATE.playing || PLAY_STATE.bookId === STATE.currentBookId) {
           document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
           document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
@@ -911,7 +1065,7 @@
           if(STATE.playing) { synth.cancel(); playAudioLine(); }
           else { togglePlay(); }
       } else {
-          togglePlay(); // Initialize playing to current book
+          togglePlay();
       }
     }
 
@@ -920,7 +1074,6 @@
       STATE.currentPage = newPage; STATE.charOffset = 0; saveState();
       renderPage(); document.getElementById('readerContent').scrollTop = 0;
       
-      // Update audio playback if playing the currently visible book
       if (STATE.playing && PLAY_STATE.bookId === STATE.currentBookId) {
           PLAY_STATE.page = STATE.currentPage;
           PLAY_STATE.charOffset = 0;
@@ -928,9 +1081,10 @@
       }
     }
 
-    /* =======================================================================
-       PERSISTENT BACKGROUND TTS ENGINE
-       ======================================================================= */
+    // ================================================================
+    // PERSISTENT BACKGROUND TTS ENGINE (Edge Browser Optimized)
+    // Web Audio API keeps the audio context alive
+    // ================================================================
     function setupVoices() {
       systemVoices = synth.getVoices();
       let sel = document.getElementById("optVoice"); if(!sel) return;
@@ -942,17 +1096,18 @@
     }
 
     function togglePlay() {
+      // Resume Web Audio Context on play
+      resumeAudioContext();
+      
       if (STATE.playing) {
         synth.pause(); STATE.playing = false; updatePlayIcon();
         document.getElementById('silentAudio').pause(); 
         handleAmbient();
       } else {
-        // If it was paused and we're looking at the same book it was playing
         if (synth.paused && PLAY_STATE.bookId === STATE.currentBookId) { 
           synth.resume(); STATE.playing = true; updatePlayIcon(); handleAmbient(); 
           document.getElementById('silentAudio').play().catch(()=>{});
         } else { 
-          // Start playing the currently OPEN book and overwrite background audio state
           PLAY_STATE.bookId = STATE.currentBookId;
           PLAY_STATE.data = STATE.data;
           PLAY_STATE.page = STATE.currentPage;
@@ -968,6 +1123,9 @@
       if(!PLAY_STATE.data || PLAY_STATE.data.length === 0) return;
       const row = PLAY_STATE.data[PLAY_STATE.page]; if (!row) return;
       const audioLangSetting = document.getElementById("optAudioLang").value;
+      
+      // Resume Web Audio Context
+      resumeAudioContext();
       
       let fullText = row.mlStr;
       if (audioLangSetting === "ml-IN") fullText = row.mlStr;
@@ -1016,13 +1174,24 @@
         document.getElementById('silentAudio').play().catch(()=>{}); 
         handleAmbient(); 
         updateMediaSessionMeta();
+        
+        // Keep Web Audio Context alive
+        resumeAudioContext();
+        
+        const rowData = PLAY_STATE.data[PLAY_STATE.page];
+        if (rowData) {
+          localStorage.setItem('last_played_book_id', PLAY_STATE.bookId);
+          localStorage.setItem('last_played_book_title', STATE.currentBook?.titleMl || 'Book');
+          localStorage.setItem('last_played_page', rowData.page || '1');
+          localStorage.setItem('last_played_part', rowData.part || '1');
+          updateContinueReading();
+        }
       };
       
       currentUtterance.onboundary = (e) => {
         if(typeof e.charIndex === 'number' && (e.name === 'word' || !e.name)) {
           PLAY_STATE.charOffset = baseCharOffset + e.charIndex; 
           
-          // Sync UI highlights ONLY if looking at the currently playing book
           if(STATE.currentBookId === PLAY_STATE.bookId && STATE.currentPage === PLAY_STATE.page) {
               STATE.charOffset = PLAY_STATE.charOffset;
               saveState();
@@ -1030,7 +1199,6 @@
               updateVisualChunk();
           }
           
-          // Update mini player unconditionally
           document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
           document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
         }
@@ -1097,7 +1265,6 @@
 
     function syncHighlights() {
       document.querySelectorAll(".word-token").forEach(el => el.classList.remove('word-hl'));
-      // Only highlight if current view matches playing view or if audio is paused and we are adjusting
       if(STATE.playing && (STATE.currentBookId !== PLAY_STATE.bookId || STATE.currentPage !== PLAY_STATE.page)) return;
       
       let spans = document.querySelectorAll(".word-token"); let targetSpan = null;
@@ -1116,13 +1283,14 @@
       document.getElementById('audioMeta').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page} / ${STATE.totalPages}`;
     }
 
-    /* =======================================================================
-       CINEMATIC VISUAL REELS HOOK PIPELINES & YT ERR 153 FIX
-       ======================================================================= */
+    // ================================================================
+    // VISUAL MODE
+    // ================================================================
     function openVisualMode() {
       document.getElementById('visualMode').classList.add('show');
       updateVisualChunk(); applyVisualBg();
       if (!STATE.playing) { togglePlay(); }
+      resumeAudioContext();
     }
 
     function closeVisualMode() {
@@ -1202,9 +1370,9 @@
       if(localVideo) localVideo.style.transform = targetScale;
     }
 
-    /* =======================================================================
-       ADVANCED BREADCRUMB DRILL-DOWN TOC (HIERARCHICAL)
-       ======================================================================= */
+    // ================================================================
+    // TOC
+    // ================================================================
     function openTOC() { 
       openModal('tocModal'); 
       buildTOCData();
@@ -1293,10 +1461,10 @@
             PLAY_STATE.page = index; PLAY_STATE.charOffset = 0; playAudioLine(); 
         } 
     }
-    
-    /* =======================================================================
-       MEDIA INTERACTION UTILITIES & BACKGROUND CONTROLS
-       ====================================================================== */
+
+    // ================================================================
+    // MEDIA SESSION
+    // ================================================================
     function setupMediaSession() {
       if('mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('play', togglePlay);
@@ -1319,6 +1487,9 @@
       }
     }
 
+    // ================================================================
+    // BOOKMARKS
+    // ================================================================
     function toggleBookmark() {
       const key = STATE.currentBookId + '_bookmarks'; let bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
       const idx = bookmarks.indexOf(STATE.currentPage);
@@ -1332,6 +1503,9 @@
       document.getElementById('readerBookmark').classList.toggle('active-bm', bookmarks.includes(STATE.currentPage));
     }
 
+    // ================================================================
+    // MODALS & SETTINGS
+    // ================================================================
     function openImport() { openModal('importModal'); }
     function openSettings() { openModal('settingsModal'); }
     function openModal(id) { document.getElementById('modalOverlay').classList.add('show'); document.getElementById(id).classList.add('show'); }
