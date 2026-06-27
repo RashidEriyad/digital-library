@@ -9,9 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Manjari:wght@400;700&family=Chilanka&family=Gayathri&family=Scheherazade+New:wght@400;700&family=Lateef&display=swap" rel="stylesheet">
   
   <style>
-    /* ================================================================
-       ROOT VARIABLES & THEMES
-       ================================================================ */
+    /* ===== ROOT VARIABLES ===== */
     :root {
       --primary-green: #1b4d3e; 
       --bg: #f4f7f6; 
@@ -19,12 +17,9 @@
       --text-dark: #2c3e50; 
       --accent: #27ae60; 
       --shadow: 0 4px 15px rgba(0,0,0,0.06);
-      
-      /* Dynamic Font Variables */
       --font-ar: 'Amiri', serif;
       --font-ml: 'Manjari', sans-serif;
       --font-en: sans-serif;
-      
       --surface: #ffffff;
       --text-muted: #7f8c8d;
       --primary: #8b5a2b;
@@ -60,9 +55,7 @@
     button, input, select { font-family: inherit; border: none; outline: none; background: transparent; color: inherit; cursor: pointer; }
     a { text-decoration: none; color: inherit; }
 
-    /* ================================================================
-       LOADER UI
-       ================================================================ */
+    /* ===== LOADER ===== */
     #loader {
       position: fixed; inset: 0; background: var(--bg); z-index: 9999;
       display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; transition: opacity 0.5s;
@@ -74,9 +67,7 @@
     .import-btn { padding: 12px 30px; background: var(--primary-green); color: white; border-radius: 10px; font-weight: bold; transition: 0.2s; cursor: pointer;}
     .import-btn:active { transform: scale(0.95); }
 
-    /* ================================================================
-       HOME VIEW HEADER & NAVIGATION
-       ================================================================ */
+    /* ===== HOME VIEW ===== */
     #homeView { display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding-bottom: 90px; }
     header.home-header {
       background: var(--primary-green); color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
@@ -84,9 +75,11 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .home-title { font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
     .top-bar .actions i { cursor: pointer; padding: 5px; font-size: 18px; margin-left: 10px; }
+    .top-bar .actions .sync-icon { color: #facc15; }
+    .top-bar .actions .sync-icon.fa-spin { color: #fff; }
     
-    .tabs { display: flex; justify-content: space-around; background: var(--primary-green); padding-bottom: 5px; }
-    .tab-item { color: #bdc3c7; padding: 10px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
+    .tabs { display: flex; justify-content: space-around; background: var(--primary-green); padding-bottom: 5px; flex-wrap: wrap; }
+    .tab-item { color: #bdc3c7; padding: 10px; cursor: pointer; font-weight: bold; font-size: 13px; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; }
     .tab-item.active { color: white; border-bottom-color: white; }
 
     .search-bar { padding: 10px 0; display: none; }
@@ -96,9 +89,7 @@
 
     .container { padding: 15px; max-width: 1000px; margin: auto; width: 100%; }
     
-    /* ================================================================
-       CONTINUE READING CARD
-       ================================================================ */
+    /* ===== CONTINUE READING ===== */
     .continue-card {
       background: var(--primary-light);
       border: 2px solid var(--primary-green);
@@ -118,17 +109,13 @@
     .continue-card .info p { font-size: 12px; color: var(--text-muted); }
     .continue-card .btn { background: var(--primary-green); color: white; padding: 8px 20px; border-radius: 30px; font-size: 13px; }
 
-    /* ================================================================
-       BOOK CARD GRID SYSTEM & CATEGORY ACCORDION
-       ================================================================ */
+    /* ===== BOOK GRID ===== */
     .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
     
-    /* Accordion style for categories/authors */
     details.group-details { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 15px; grid-column: 1/-1; overflow: hidden; }
     details.group-details summary { padding: 15px; font-weight: bold; color: var(--primary-green); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; background: var(--primary-light); }
     details.group-details summary::-webkit-details-marker { display: none; }
     details.group-details .group-content { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; border-top: 1px solid var(--border); background: var(--bg); }
-    [data-theme="dark"] details.group-details summary { color: var(--primary); }
 
     .book-card {
       background: var(--card-bg); border-radius: var(--radius); overflow: hidden;
@@ -139,66 +126,148 @@
     .book-avatar-fallback { width: 100%; height: 200px; background: linear-gradient(135deg, var(--primary-green), #2c3e50); display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; }
     .book-details { padding: 12px; text-align: center; flex-grow: 1; }
     .book-details h3 { margin: 0; font-size: 15px; color: var(--primary-green); line-height: 1.4; height: 42px; overflow: hidden; }
-    [data-theme="dark"] .book-details h3 { color: var(--primary); }
     .book-author { font-size: 12px; color: var(--text-muted); margin-top: 5px; height: 32px; overflow: hidden; }
     .book-parts-badge { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
     .book-footer { display: flex; border-top: 1px solid var(--border); align-items: stretch; }
     .more-btn { width: 40px; border: none; background: none; color: var(--text-muted); border-right: 1px solid var(--border); cursor: pointer; }
     .open-btn { flex-grow: 1; border: none; background: none; color: var(--primary-green); font-weight: bold; padding: 12px; cursor: pointer; font-size: 14px; }
-    [data-theme="dark"] .open-btn { color: var(--primary); }
 
     .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 15px rgba(0,0,0,0.1); z-index: 1000; border-top: 1px solid var(--border); }
     .nav-link { text-align: center; color: var(--text-muted); font-size: 12px; flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav-link i { font-size: 22px; }
     .nav-link.active { color: var(--primary-green); font-weight: bold; }
-    [data-theme="dark"] .nav-link.active { color: var(--primary); }
 
-    /* ================================================================
-       READER MODE INTERFACE
-       ================================================================ */
+    /* ===== READER VIEW - BOOK LIKE UI ===== */
     #readerView { display: none; flex-direction: column; height: 100%; position: fixed; inset: 0; background: var(--bg); z-index: 2000; }
     #readerView.show { display: flex; }
-    .reader-header { background: var(--surface); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 1px solid var(--border); min-height: 55px; }
+    .reader-header {
+      background: var(--surface); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 1px solid var(--border); min-height: 55px;
+    }
     .back-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-dark); padding: 5px; }
     .reader-title { font-size: 16px; font-weight: bold; flex: 1; text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
     .reader-actions { display: flex; gap: 16px; font-size: 18px; }
     .reader-actions i { cursor: pointer; color: var(--text-muted); }
     .reader-actions .active-bm { color: #f59e0b; text-shadow: 0 0 10px rgba(245,158,11,0.5); }
+    .reader-actions .sync-icon { color: #facc15; }
 
-    .reader-content { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 90px; }
+    /* Book-like scrollable content */
+    .reader-content {
+      flex: 1; overflow-y: auto; padding: 15px 15px 90px 15px;
+      scroll-behavior: smooth;
+    }
     
-    .reader-page-card { background: var(--surface); padding: 25px 20px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); min-height: 50vh; }
-    .head-badge { display: table; margin: 0 auto 16px auto; padding: 6px 20px; background: var(--primary-light); color: var(--primary-dark); font-weight: 700; border-radius: 50px; font-size: 13px; border: 1px solid var(--primary); }
-    .ar-content { font-family: var(--font-ar); font-size: calc(var(--font-scale) + 6px); color: #1a5f7a; direction: rtl; line-height: 2.2; font-weight: 700; text-align: right; margin-bottom: 16px; }
+    /* Page card with book-like styling */
+    .reader-page-card {
+      background: var(--surface);
+      padding: 30px 25px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    /* Page break separator between pages */
+    .page-separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin: 25px 0;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .page-separator::before,
+    .page-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .page-separator .page-icon {
+      background: var(--primary-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--primary-green);
+      border: 1px solid var(--primary);
+    }
+
+    .head-badge {
+      display: inline-block;
+      padding: 4px 16px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+      border-radius: 50px;
+      font-size: 12px;
+      border: 1px solid var(--primary);
+      margin-bottom: 12px;
+    }
+    .ar-content { font-family: var(--font-ar); font-size: calc(var(--font-scale) + 6px); color: #1a5f7a; direction: rtl; line-height: 2.2; font-weight: 700; text-align: right; }
     [data-theme="dark"] .ar-content { color: #81d4fa; }
-    .ml-content { font-family: var(--font-ml); font-size: var(--font-scale); line-height: 2.1; margin-bottom: 12px; }
-    .en-content { font-family: var(--font-en); font-size: calc(var(--font-scale) - 1px); line-height: 1.9; color: var(--text-muted); font-style: italic; border-top: 1px dashed var(--border); padding-top: 15px; }
+    .ml-content { font-family: var(--font-ml); font-size: var(--font-scale); line-height: 2.1; margin-top: 8px; }
+    .en-content { font-family: var(--font-en); font-size: calc(var(--font-scale) - 1px); line-height: 1.9; color: var(--text-muted); font-style: italic; border-top: 1px dashed var(--border); padding-top: 12px; margin-top: 12px; }
     
     .word-token { cursor: pointer; transition: 0.15s; padding: 0 2px; border-radius: 4px; display: inline-block; }
     .word-hl { background: #facc15 !important; color: #000 !important; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 8px rgba(250,204,21,0.5); }
-    [data-theme="dark"] .word-hl { background-color: #f59e0b !important; color: #fff !important; }
 
-    .reader-pagination { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; margin-top: 15px; background: var(--surface); border-radius: 50px; border: 1px solid var(--border); }
-    .reader-pagination button { padding: 8px 18px; border-radius: 30px; background: var(--bg); border: 1px solid var(--border); font-weight: bold; color: var(--text-dark); }
-    .page-num { font-weight: bold; color: var(--primary-green); font-size: 15px; }
+    /* Navigation buttons - floating style */
+    .reader-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      gap: 10px;
+    }
+    .reader-nav button {
+      padding: 10px 20px;
+      border-radius: 30px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-weight: bold;
+      color: var(--text-dark);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .reader-nav button:active { transform: scale(0.95); }
+    .reader-nav .page-num { font-weight: bold; color: var(--primary-green); font-size: 14px; }
 
-    .reader-bottom-nav { position: fixed; bottom: 0; width: 100%; height: var(--bottom-nav); background: var(--surface); display: flex; align-items: center; z-index: 500; border-top: 1px solid var(--border); }
-    .nav-tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 11px; font-weight: bold; gap: 6px; height: 100%; cursor: pointer; }
+    .reader-bottom-nav {
+      position: fixed; bottom: 0; width: 100%; height: var(--bottom-nav);
+      background: var(--surface); display: flex; align-items: center; z-index: 500;
+      border-top: 1px solid var(--border);
+    }
+    .nav-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 11px; font-weight: bold; gap: 6px; height: 100%; cursor: pointer;
+    }
     .nav-tab.active { color: var(--primary-green); }
 
-    /* ================================================================
-       MINI PLAYER & AUDIO HUB
-       ================================================================ */
-    .mini-player { position: fixed; bottom: var(--bottom-nav); width: 100%; height: 52px; background: var(--surface); border-top: 1px solid var(--border); display: none; align-items: center; padding: 0 14px; z-index: 1500; box-shadow: 0 -4px 15px rgba(0,0,0,0.06); }
+    /* ===== MINI PLAYER ===== */
+    .mini-player {
+      position: fixed; bottom: var(--bottom-nav); width: 100%; height: 52px;
+      background: var(--surface); border-top: 1px solid var(--border);
+      display: none; align-items: center; padding: 0 14px; z-index: 1500;
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
+    }
     .mini-player.show { display: flex; }
     .mini-details { flex: 1; overflow: hidden; cursor: pointer; }
-    .mini-title { font-weight: bold; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-ml); }
+    .mini-title { font-weight: bold; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .mini-progress { font-size: 10px; color: var(--text-muted); }
     .mini-controls { display: flex; gap: 14px; font-size: 18px; color: var(--primary-green); align-items: center; }
 
-    .audio-player { background: var(--surface); padding: 25px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-lg); text-align: center; }
+    /* ===== AUDIO PLAYER ===== */
+    .audio-player {
+      background: var(--surface); padding: 25px; border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow-lg); text-align: center;
+    }
     .audio-icon { font-size: 60px; color: var(--primary-green); margin-bottom: 15px; }
-    .audio-title-text { font-family: var(--font-ml); font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+    .audio-title-text { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
     .audio-meta { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
     .audio-controls { display: flex; justify-content: center; align-items: center; gap: 25px; }
     .audio-controls i { font-size: 28px; color: var(--primary-green); cursor: pointer; }
@@ -206,31 +275,40 @@
     .audio-progress { width: 100%; height: 5px; background: var(--border); border-radius: 3px; margin-top: 20px; position: relative; }
     .progress-bar { height: 100%; background: var(--primary-green); border-radius: 3px; width: 0%; transition: width 0.1s; }
 
-    /* ================================================================
-       CINEMATIC VISUAL VIEWPORT (With Stroke Enhancement)
-       ================================================================ */
-    .visual-mode { position: fixed; inset: 0; z-index: 2500; display: none; background: #000; flex-direction: column; }
+    /* ===== VISUAL MODE ===== */
+    .visual-mode {
+      position: fixed; inset: 0; z-index: 2500; display: none; background: #000; flex-direction: column;
+    }
     .visual-mode.show { display: flex; }
+    .visual-mode.fullscreen { z-index: 9999; }
+    
     .visual-video-wrapper { position: absolute; inset: 0; z-index: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; }
     .visual-video-wrapper iframe, .visual-video-wrapper video { width: 100vw; height: 100vh; object-fit: cover; pointer-events: none; border: none; }
-    .visual-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0); z-index: 2; }
+    .visual-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); z-index: 2; }
     
-    .visual-content { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 120px 25px; color: white; text-align: center; }
-    
-    /* Text stroke and enhanced shadow for better visibility on white backgrounds */
-    .vis-ar { font-family: var(--font-ar); font-size: 34px; direction: rtl; line-height: 2.2; margin-bottom: 20px; color: #81d4fa; -webkit-text-stroke: 1px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0px 0px 10px rgba(0,0,0,1); }
-    .vis-ml { font-family: var(--font-ml); font-size: 24px; line-height: 2; margin-bottom: 15px; -webkit-text-stroke: 1px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0px 0px 10px rgba(0,0,0,1); }
-    .vis-en { font-family: var(--font-en); font-size: 20px; font-style: italic; opacity: 0.9; -webkit-text-stroke: 0.5px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0px 0px 10px rgba(0,0,0,1); }
+    .visual-content {
+      position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; padding: 100px 25px; color: white; text-align: center;
+    }
+    .vis-ar { font-family: var(--font-ar); font-size: 34px; direction: rtl; line-height: 2.2; margin-bottom: 20px; color: #81d4fa; -webkit-text-stroke: 1px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1); }
+    .vis-ml { font-size: 24px; line-height: 2; margin-bottom: 15px; -webkit-text-stroke: 1px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1); }
+    .vis-en { font-size: 20px; font-style: italic; opacity: 0.9; -webkit-text-stroke: 0.5px black; text-shadow: 2px 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,1); }
 
-    .visual-controls { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; z-index: 20; font-size: 26px; color: white; text-shadow: 0 2px 15px rgba(0,0,0,0.9); align-items: center; background: rgba(0,0,0,0.6); padding: 8px 25px; border-radius: 50px; backdrop-filter: blur(5px); }
-    .vis-play { font-size: 36px; color: #38bdf8; }
+    .visual-controls {
+      position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 20px; z-index: 20; font-size: 24px; color: white;
+      text-shadow: 0 2px 15px rgba(0,0,0,0.9); align-items: center;
+      background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 50px; backdrop-filter: blur(5px);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .vis-play { font-size: 32px; color: #38bdf8; }
     .vis-close-btn { color: #ef4444; }
+    .vis-fullscreen-btn { color: #facc15; }
     .visual-progress { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 500px; height: 3px; background: rgba(255,255,255,0.3); }
     .vis-progress-bar { height: 100%; background: #38bdf8; width: 0%; }
 
-    /* ================================================================
-       MODALS & FIXED DRAWERS
-       ================================================================ */
+    /* ===== MODALS ===== */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 3000; }
     .modal-overlay.show { display: block; }
     
@@ -245,29 +323,32 @@
     .setting-label { display: block; font-size: 12px; font-weight: bold; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
     .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg); border-radius: 8px; margin-bottom: 5px; font-size: 14px; border: 1px solid var(--border); }
     .setting-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-green); }
-    .setting-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-dark); font-family: var(--font-ml); }
-    .setting-row select { width: auto; padding: 6px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dark); }
+    .setting-group select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text-dark); }
     .setting-group input[type="range"] { width: 100%; accent-color: var(--primary-green); cursor: pointer; }
     .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .theme-btn { padding: 10px; border: 2px solid var(--border); border-radius: 8px; text-align: center; font-weight: bold; font-size: 13px; cursor: pointer; background: var(--bg); color: var(--text-dark);}
     .theme-btn.active { border-color: var(--primary-green); background: var(--primary-light); color: var(--primary-green); }
 
-    /* ================================================================
-       ADVANCED BREADCRUMB DRILL-DOWN TOC
-       ================================================================ */
     .toc-breadcrumb { padding: 10px 15px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 13px; font-weight: bold; color: var(--text-muted); flex-shrink: 0; }
     .toc-breadcrumb span { cursor: pointer; color: var(--primary-green); transition: 0.2s; }
-    .toc-breadcrumb span:hover { text-decoration: underline; }
-    
     .toc-item { padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; color: var(--text-dark); transition: 0.15s; display: flex; flex-direction: column; }
     .toc-item:active { background: var(--bg); padding-left: 20px; }
     .toc-item.current { background: var(--primary-light); border-left: 4px solid var(--primary-green); }
     .toc-badge { display: inline-block; padding: 3px 8px; background: var(--primary-light); color: var(--primary-green); border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 6px; width: fit-content; text-transform: uppercase; }
     .toc-title-text { font-size: 16px; font-weight: bold; }
-    .toc-translations { font-size: 12px; color: var(--text-muted); margin-top: 5px; font-family: var(--font-ml); }
+    .toc-translations { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
 
     .import-zone { text-align: center; padding: 10px 20px; }
     .import-input-field { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text-dark); }
+
+    @media (max-width: 600px) {
+      .book-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .ar-content { font-size: 20px; }
+      .vis-ar { font-size: 26px; }
+      .vis-ml { font-size: 20px; }
+      .vis-en { font-size: 16px; }
+      .visual-controls { gap: 12px; font-size: 18px; padding: 6px 14px; top: 15px; }
+    }
   </style>
 </head>
 <body>
@@ -284,14 +365,13 @@
     <input type="file" id="masterFileInput" accept=".json" style="display:none;" onchange="handleMasterUpload(event)">
   </div>
 
-  <!-- ================================================================
-       WEB AUDIO API - Oscillator for Background Audio Lock
-       ഇത് TTS വോയിസ് കട്ട് ആവാതിരിക്കാൻ സഹായിക്കുന്നു
-       ================================================================ -->
+  <!-- Audio Elements -->
   <audio id="silentAudio" loop playsinline src="https://raw.githubusercontent.com/anars/blank-audio/master/10-minutes-of-silence.mp3"></audio>
   <audio id="ambRain" loop src="https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav"></audio>
   <audio id="ambWind" loop src="https://assets.mixkit.co/active_storage/sfx/2432/2432-84.wav"></audio>
   <audio id="ambNasheed" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+  <!-- New: Background Nasheda from Audio folder -->
+  <audio id="bgNasheda" loop src="Audio/Nasheda_1.mp3"></audio>
 
   <div id="homeView">
     <header class="home-header">
@@ -299,11 +379,12 @@
         <div class="logo"><i class="fas fa-layer-group"></i> <span class="home-title">Adventure Library Pro</span></div>
         <div class="actions">
           <i class="fas fa-search" onclick="toggleSearch()"></i>
+          <i class="fas fa-sync-alt sync-icon" onclick="syncAllBooks()" title="Sync new parts from files"></i>
           <i class="fas fa-cloud-upload-alt" onclick="openImport()"></i>
         </div>
       </div>
       <div class="search-bar" id="searchBar">
-        <input type="text" id="searchInput" placeholder="ഗ്രന്ഥങ്ങൾ തിരയുക (Search books...)" oninput="searchBooks(this.value)">
+        <input type="text" id="searchInput" placeholder="ഗ്രന്ഥങ്ങൾ തിരയുക..." oninput="searchBooks(this.value)">
       </div>
       <div class="tabs">
         <div class="tab-item active" id="tab-all" onclick="filterShelf('all')">All Books</div>
@@ -313,7 +394,6 @@
     </header>
 
     <div class="container">
-      <!-- Continue Reading Card -->
       <div class="continue-card" id="continueCard" onclick="continueReading()">
         <div class="info">
           <h4><i class="fas fa-book-open"></i> Continue Reading</h4>
@@ -321,7 +401,6 @@
         </div>
         <div class="btn"><i class="fas fa-play"></i> Resume</div>
       </div>
-      
       <div class="book-grid" id="bookGrid"></div>
     </div>
 
@@ -335,18 +414,19 @@
   <div id="readerView">
     <header class="reader-header">
       <button class="back-btn" onclick="closeReader()"><i class="fas fa-arrow-left"></i></button>
-      <span class="reader-title" id="readerTitle">Loading Canvas...</span>
+      <span class="reader-title" id="readerTitle">Loading...</span>
       <div class="reader-actions">
         <i class="fas fa-bookmark" id="readerBookmark" onclick="toggleBookmark()"></i>
         <i class="fas fa-list-ol" onclick="openTOC()"></i>
+        <i class="fas fa-sync-alt sync-icon" onclick="syncCurrentBook()" title="Sync new parts"></i>
         <i class="fas fa-cog" onclick="openSettings()"></i>
       </div>
     </header>
 
     <div class="reader-content" id="readerContent">
       <div id="ebookView">
-        <div class="reader-page-card" id="readerPageCard"></div>
-        <div class="reader-pagination">
+        <div id="readerPageContainer"></div>
+        <div class="reader-nav">
           <button onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Prev</button>
           <span class="page-num" id="readerPageNum">0 / 0</span>
           <button onclick="changePage(1)">Next <i class="fas fa-chevron-right"></i></button>
@@ -408,6 +488,7 @@
       <i class="fas fa-play vis-play" id="visPlayBtn" onclick="toggleVisualPlay()"></i>
       <i class="fas fa-forward-step" onclick="changeVisualPage(1)"></i>
       <i class="fas fa-stop" onclick="stopVisualAudio()"></i>
+      <i class="fas fa-expand vis-fullscreen-btn" onclick="toggleVisualFullscreen()" title="Fullscreen"></i>
       <i class="fas fa-times-circle vis-close-btn" onclick="closeVisualMode()"></i>
     </div>
 
@@ -423,12 +504,12 @@
 
   <div class="modal-box" id="settingsModal">
     <div class="modal-header">
-      <span>⚙️ സിസ്റ്റം ക്രമീകരണങ്ങൾ</span>
+      <span>⚙️ ക്രമീകരണങ്ങൾ</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="setting-group">
-        <label class="setting-label">🔤 Font Customization (ഫോണ്ടുകൾ)</label>
+        <label class="setting-label">🔤 Font Customization</label>
         <div class="setting-row"><span>മലയാളം</span>
           <select id="optFontMl" onchange="applyFonts()">
             <option value="'Manjari', sans-serif">Manjari</option>
@@ -437,7 +518,7 @@
             <option value="sans-serif">System Default</option>
           </select>
         </div>
-        <div class="setting-row"><span>Arabic (അറബിക്)</span>
+        <div class="setting-row"><span>Arabic</span>
           <select id="optFontAr" onchange="applyFonts()">
             <option value="'Amiri', serif">Amiri</option>
             <option value="'Scheherazade New', serif">Scheherazade New</option>
@@ -445,7 +526,7 @@
             <option value="serif">System Default</option>
           </select>
         </div>
-        <div class="setting-row"><span>English (ഇംഗ്ലീഷ്)</span>
+        <div class="setting-row"><span>English</span>
           <select id="optFontEn" onchange="applyFonts()">
             <option value="sans-serif">Sans-Serif</option>
             <option value="serif">Serif</option>
@@ -455,31 +536,30 @@
       </div>
 
       <div class="setting-group">
-        <label class="setting-label">🎙️ TTS Voice Control & Language Channel</label>
+        <label class="setting-label">🎙️ TTS Voice</label>
         <select id="optAudioLang" onchange="setupVoices(); applyAudioSettings(true);" style="margin-bottom:10px;">
-          <option value="ml-IN" selected>മലയാളം (Malayalam)</option>
-          <option value="ar-EG">അറബിക് (Arabic)</option>
-          <option value="en-US">ഇംഗ്ലീഷ് (English)</option>
+          <option value="ml-IN" selected>മലയാളം</option>
+          <option value="ar-EG">അറബിക്</option>
+          <option value="en-US">ഇംഗ്ലീഷ്</option>
         </select>
-        <label class="setting-label">👤 Active Speech Synthesizer</label>
         <select id="optVoice" onchange="applyAudioSettings(true)"></select>
       </div>
       <div class="setting-group">
-        <label class="setting-label">📏 Speech Speed Velocity</label>
+        <label class="setting-label">📏 Speech Speed</label>
         <input type="range" id="optSpeed" min="0.5" max="1.5" step="0.1" value="1.0" onchange="applyAudioSettings(true)">
       </div>
       <div class="setting-group">
-        <label class="setting-label">📖 Display Core Layers</label>
-        <div class="setting-row"><span>അറബിക് വരികൾ (Arabic)</span><input type="checkbox" id="optShowAr" checked onchange="renderAllViews()"></div>
-        <div class="setting-row"><span>മലയാളം പരിഭാഷ (Malayalam)</span><input type="checkbox" id="optShowMl" checked onchange="renderAllViews()"></div>
-        <div class="setting-row"><span>ഇംഗ്ലീഷ് വിവരണം (English)</span><input type="checkbox" id="optShowEn" checked onchange="renderAllViews()"></div>
+        <label class="setting-label">📖 Display Layers</label>
+        <div class="setting-row"><span>Arabic</span><input type="checkbox" id="optShowAr" checked onchange="renderAllViews()"></div>
+        <div class="setting-row"><span>Malayalam</span><input type="checkbox" id="optShowMl" checked onchange="renderAllViews()"></div>
+        <div class="setting-row"><span>English</span><input type="checkbox" id="optShowEn" checked onchange="renderAllViews()"></div>
       </div>
       <div class="setting-group">
-        <label class="setting-label">📏 Global Font Scale Range</label>
+        <label class="setting-label">📏 Font Size</label>
         <input type="range" id="optFontSize" min="14" max="30" value="18" onchange="applyFontSize()">
       </div>
       <div class="setting-group">
-        <label class="setting-label">🎨 Interface Theme Matrix</label>
+        <label class="setting-label">🎨 Theme</label>
         <div class="theme-grid">
           <div class="theme-btn active" id="th-light" onclick="setTheme('light')">☀️ Light</div>
           <div class="theme-btn" id="th-dark" onclick="setTheme('dark')">🌙 Dark</div>
@@ -487,29 +567,30 @@
         </div>
       </div>
       <div class="setting-group">
-        <label class="setting-label">🎵 Ambient Sound Multi-Mixer</label>
+        <label class="setting-label">🎵 Background Sound</label>
         <select id="optAmbient" onchange="handleAmbient()">
-          <option value="none" selected>🔇 ഓഫാക്കുക</option>
-          <option value="rain">🌧️ മഴ (Rain Sound)</option>
-          <option value="wind">🍃 കാറ്റ് (Wind Breeze)</option>
-          <option value="nasheed">🎵 ഇസ്ലാമിക് നഷീദ് (Background Nasheed)</option>
+          <option value="none" selected>🔇 Off</option>
+          <option value="rain">🌧️ Rain</option>
+          <option value="wind">🍃 Wind</option>
+          <option value="nasheed">🎵 Nasheed</option>
+          <option value="nasheda">🎵 Nasheda_1 (Audio Folder)</option>
         </select>
       </div>
       <div class="setting-group">
-        <div class="setting-row"><span><b>🔄 Auto Page Navigation Link</b></span><input type="checkbox" id="optAutoNext" checked></div>
-        <div class="setting-row"><span><b>🔊 Click Token to Speak Word</b></span><input type="checkbox" id="optTouchSpeak" checked></div>
+        <div class="setting-row"><span><b>🔄 Auto Next</b></span><input type="checkbox" id="optAutoNext" checked></div>
+        <div class="setting-row"><span><b>🔊 Click to Speak</b></span><input type="checkbox" id="optTouchSpeak" checked></div>
       </div>
       <div class="setting-group">
-        <label class="setting-label">🎬 YouTube Reel Stream ID/URL</label>
-        <input type="text" id="optYoutubeId" placeholder="e.g. dQw4w9WgXcQ അല്ലെങ്കിൽ പൂർണ്ണ ലിങ്ക്" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-dark);">
-        <button class="import-btn" style="width:100%; margin-top:5px; padding:8px;" onclick="applyVisualBg()">Update Video Hook</button>
+        <label class="setting-label">🎬 YouTube Reel ID</label>
+        <input type="text" id="optYoutubeId" placeholder="e.g. dQw4w9WgXcQ" style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text-dark);">
+        <button class="import-btn" style="width:100%; margin-top:5px; padding:8px;" onclick="applyVisualBg()">Update Video</button>
       </div>
     </div>
   </div>
 
   <div class="modal-box" id="tocModal" style="padding:0;">
     <div class="modal-header">
-      <span>📑 വിപുലമായ സൂചിക (Advanced Index)</span>
+      <span>📑 സൂചിക</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="toc-breadcrumb" id="tocBreadcrumb"></div>
@@ -518,26 +599,29 @@
 
   <div class="modal-box" id="importModal">
     <div class="modal-header">
-      <span>📂 സ്മാർട്ട് ഫയൽ ഇൻജെക്ടർ</span>
+      <span>📂 ഫയൽ ഇൻജെക്ടർ</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
       <div class="import-zone">
         <i class="fas fa-server" style="font-size:45px; color:var(--primary-green); margin-bottom:10px;"></i>
-        <h3>IndexedDB Storage Sandbox</h3>
+        <h3>IndexedDB Storage</h3>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">books.json ലിസ്റ്റിലുള്ള പുസ്തകത്തിലേക്ക് ഭാഗങ്ങൾ ഇൻജെക്ട് ചെയ്യാം</p>
         
         <div class="setting-group" style="text-align:left;">
-          <label class="setting-label">1. ടാർഗെറ്റ് പുസ്തകം തിരഞ്ഞെടുക്കുക</label>
+          <label class="setting-label">1. Target Book</label>
           <select id="injectorTargetBookSelect" style="margin-bottom:15px;"></select>
           
-          <label class="setting-label">2. ഭാഗങ്ങൾ അപ്‌ലോഡ് ചെയ്യുക (Select Part JSON Files)</label>
+          <label class="setting-label">2. Upload Part JSON Files</label>
           <input type="file" id="bulkPartsFileInput" accept=".json" multiple onchange="handleBulkPartsUpload(event)" class="import-input-field">
+          <div style="margin-top:8px; font-size:12px; color:var(--text-muted);">
+            <i class="fas fa-info-circle"></i> Multiple files select ചെയ്യാം (Ctrl+Click)
+          </div>
         </div>
         
         <div style="border-top:1px dashed var(--border); margin-top:15px; padding-top:15px;">
           <button class="import-btn" style="width:100%; background:#7f8c8d;" onclick="document.getElementById('masterFileInput').click()">
-            <i class="fas fa-cog"></i> പുതിയ books.json മാസ്റ്റർ അപ്‌ലോഡ് ചെയ്യുക
+            <i class="fas fa-cog"></i> New books.json Upload
           </button>
         </div>
         <div id="injectorStatusText" style="margin-top:12px; font-weight:bold; color:var(--accent);"></div>
@@ -547,62 +631,36 @@
 
   <script>
     // ================================================================
-    // WEB AUDIO API - Oscillator for Background Audio Lock
-    // ഇത് TTS വോയിസ് കട്ട് ആവാതിരിക്കാൻ സഹായിക്കുന്നു
+    // WEB AUDIO API
     // ================================================================
-    
     let audioCtx = null;
     let oscillator = null;
     let gainNode = null;
-    let isAudioContextRunning = false;
 
     function initAudioContext() {
       try {
-        // Create Audio Context
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create Oscillator Node (ultrasonic frequency - inaudible)
         oscillator = audioCtx.createOscillator();
         oscillator.type = 'sine';
-        oscillator.frequency.value = 18000; // 18kHz - almost inaudible
-        
-        // Create Gain Node (volume control)
+        oscillator.frequency.value = 18000;
         gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.001; // Very low volume (almost silent)
-        
-        // Connect nodes
+        gainNode.gain.value = 0.001;
         oscillator.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        
-        // Start oscillator
         oscillator.start();
-        
-        // Resume audio context
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        
-        isAudioContextRunning = true;
-        console.log('✅ Web Audio API initialized for background audio lock');
-      } catch (error) {
-        console.warn('⚠️ Web Audio API not supported:', error);
-      }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        console.log('✅ Web Audio API initialized');
+      } catch(e) { console.warn('⚠️ Web Audio API not supported'); }
     }
 
     function resumeAudioContext() {
-      if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
-        isAudioContextRunning = true;
-      }
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     }
-
-    // Resume audio context on any user interaction
     document.addEventListener('click', resumeAudioContext);
     document.addEventListener('touchstart', resumeAudioContext);
-    document.addEventListener('keydown', resumeAudioContext);
 
     // ================================================================
-    // DATABASE & STATE
+    // DATABASE
     // ================================================================
     const DB_NAME = "AdventureMultiBookStorageEngineDB";
     const DB_VERSION = 1;
@@ -614,7 +672,8 @@
       totalPages: 0, data: [], bookmarks: [], playing: false, theme: 'light',
       mode: 'ebook', fontScale: 18, showAr: true, showMl: true, showEn: true,
       ttsLang: 'ml-IN', speed: 1.0, autoNext: true, touchSpeak: true,
-      currentBookId: null, visualYoutubeId: '', charOffset: 0, shelfFilter: 'all'
+      currentBookId: null, visualYoutubeId: '', charOffset: 0, shelfFilter: 'all',
+      partCount: 0, isFullscreen: false
     };
 
     const PLAY_STATE = {
@@ -625,37 +684,8 @@
     let synth = window.speechSynthesis;
     let currentUtterance = null;
     let audioProgressInterval = null;
-    let touchStartX = 0; let touchEndX = 0;
-    
-    let tocTree = [];
-    let tocPath = [];
-
-    // ================================================================
-    // CONTINUE READING - Home Page Card
-    // ================================================================
-    function updateContinueReading() {
-      const card = document.getElementById('continueCard');
-      const info = document.getElementById('continueInfo');
-      
-      const lastBookId = localStorage.getItem('last_played_book_id');
-      const lastPage = localStorage.getItem('last_played_page');
-      const lastPart = localStorage.getItem('last_played_part');
-      const lastTitle = localStorage.getItem('last_played_book_title');
-      
-      if (lastBookId && lastPage) {
-        card.style.display = 'flex';
-        info.textContent = `${lastTitle || 'Book'} - ഭാഗം ${lastPart || '1'} - പേജ് ${lastPage}`;
-      } else {
-        card.style.display = 'none';
-      }
-    }
-
-    function continueReading() {
-      const bookId = localStorage.getItem('last_played_book_id');
-      if (bookId) {
-        openBook(bookId);
-      }
-    }
+    let touchStartX = 0, touchEndX = 0;
+    let tocTree = [], tocPath = [];
 
     // ================================================================
     // INDEXEDDB FUNCTIONS
@@ -712,110 +742,96 @@
     }
 
     // ================================================================
-    // INITIALIZATION
+    // LOAD ALL PARTS
     // ================================================================
-    document.addEventListener('DOMContentLoaded', async () => {
-      loadPreferences();
-      setupVoices();
-      
-      // Initialize Web Audio API on user interaction
-      initAudioContext();
-      
-      if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = setupVoices;
-      window.addEventListener("resize", adjustVideoScale);
-      setupMediaSession();
-      setupSwipeGestures();
-      
-      STATE.books = await loadCatalogFromDB();
-      if(STATE.books && STATE.books.length > 0) {
-        renderBooks(STATE.books);
-        populateInjectorOptions();
-        document.getElementById('loader').classList.add('hidden');
-        updateContinueReading();
-      } else {
-        loadLibrary();
-      }
-    });
+    async function loadAllParts(book) {
+      const folder = book.folder || book.id;
+      const basePath = `Books/${folder}/${folder}_part_`;
+      let allData = [];
+      let partNum = 1;
+      let loadedParts = 0;
 
-    function setupSwipeGestures() {
-      const ebookViewArea = document.getElementById('ebookView');
-      ebookViewArea.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      }, {passive: true});
-      ebookViewArea.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
-      }, {passive: true});
-    }
-
-    function handleSwipe() {
-      const SWIPE_THRESHOLD = 50;
-      if (touchStartX - touchEndX > SWIPE_THRESHOLD) changePage(1);
-      if (touchEndX - touchStartX > SWIPE_THRESHOLD) changePage(-1);
-    }
-
-    async function loadLibrary() {
-      try {
-        const response = await fetch('books.json');
-        const data = await response.json();
-        if (data && data.length > 0) {
-          STATE.books = data;
-          await saveCatalogToDB(data);
-          renderBooks(data);
-          populateInjectorOptions();
-          document.getElementById('loader').classList.add('hidden');
-          updateContinueReading();
-        } else { showImportScreen(); }
-      } catch (err) { showImportScreen(); }
-    }
-
-    function showImportScreen() {
-      document.getElementById('loadStatus').textContent = '📂 books.json മാസ്റ്റർ ലിസ്റ്റ് ഇൻജെക്ട് ചെയ്യുക';
-      document.getElementById('manualInjectControls').style.display = 'block';
-    }
-
-    function populateInjectorOptions() {
-      const select = document.getElementById('injectorTargetBookSelect'); if(!select) return;
-      select.innerHTML = STATE.books.map(b => `<option value="${b.id}">${b.titleMl || b.title} (${b.id})</option>`).join('');
-    }
-
-    async function handleMasterUpload(e) {
-      const file = e.target.files[0]; if (!file) return;
-      if (file.name !== 'books.json') { alert("books.json ഫയൽ മാത്രമേ മാസ്റ്റർ ഫയൽ ആയി അപ്‌ലോഡ് ചെയ്യാൻ പാടുള്ളൂ!"); return; }
-      
-      const text = await file.text();
-      try {
-        const parsed = JSON.parse(text);
-        STATE.books = parsed; await saveCatalogToDB(parsed);
-        renderBooks(parsed); populateInjectorOptions();
-        document.getElementById('loader').classList.add('hidden');
-        alert("✅ books.json വിജയകരമായി സിങ്ക് ചെയ്തു!");
-      } catch(err) { alert("Invalid JSON file"); }
-    }
-
-    async function handleBulkPartsUpload(e) {
-      const files = e.target.files; if (!files.length) return;
-      const targetBookId = document.getElementById('injectorTargetBookSelect').value;
-      const statusText = document.getElementById('injectorStatusText');
-      statusText.innerText = "ഡാറ്റാബേസ് ലോക്ക് ചെയ്യുന്നു...";
-      
-      let count = 0;
-      for (let file of files) {
-        const text = await file.text();
+      while (true) {
         try {
-          const rawData = JSON.parse(text);
-          if(rawData.length > 0) {
-            let processed = parseIncomingPayload(rawData, targetBookId);
-            await saveIsolatedBookData(processed);
-            count++;
-          }
-        } catch(ex) {}
+          const response = await fetch(`${basePath}${partNum}.json`);
+          if (!response.ok) break;
+          const rawJson = await response.json();
+          if (rawJson && rawJson.length > 0) {
+            const processed = parseIncomingPayload(rawJson, book.id);
+            allData = allData.concat(processed);
+            loadedParts++;
+            partNum++;
+          } else break;
+        } catch (err) { break; }
       }
-      statusText.innerText = `✅ ${count} ഭാഗങ്ങൾ വിജയകരമായി അപ്‌ലോഡ് ചെയ്തു!`;
-      setTimeout(() => { statusText.innerText = ""; closeModal(); }, 2000);
-      if(STATE.currentBookId === targetBookId) openBook(targetBookId);
+
+      if (allData.length > 0) {
+        await saveIsolatedBookData(allData);
+        book.parts = loadedParts;
+        STATE.partCount = loadedParts;
+        await saveCatalogToDB(STATE.books);
+      }
+      return allData;
     }
 
+    // ================================================================
+    // SYNC FUNCTIONS
+    // ================================================================
+    async function syncBookParts(bookId) {
+      const book = STATE.books.find(b => b.id === bookId);
+      if (!book) return false;
+
+      const folder = book.folder || book.id;
+      const basePath = `Books/${folder}/${folder}_part_`;
+      let partNum = 1;
+      let fileCount = 0;
+
+      while (true) {
+        try {
+          const response = await fetch(`${basePath}${partNum}.json`);
+          if (!response.ok) break;
+          fileCount++;
+          partNum++;
+        } catch (err) { break; }
+      }
+
+      if (fileCount === 0) return false;
+
+      const allData = await loadAllParts(book);
+      if (allData.length > 0) {
+        if (STATE.currentBookId === bookId) await openBook(bookId);
+        return true;
+      }
+      return false;
+    }
+
+    async function syncAllBooks() {
+      const icon = document.querySelector('.fa-sync-alt');
+      if (icon) icon.classList.add('fa-spin');
+      let synced = 0;
+      for (const book of STATE.books) {
+        const result = await syncBookParts(book.id);
+        if (result) synced++;
+      }
+      if (synced > 0) {
+        alert(`✅ ${synced} book(s) synced!`);
+        renderBooks(STATE.books);
+      } else {
+        alert('ℹ️ No new parts found.');
+      }
+      if (icon) icon.classList.remove('fa-spin');
+    }
+
+    async function syncCurrentBook() {
+      if (!STATE.currentBookId) return;
+      const result = await syncBookParts(STATE.currentBookId);
+      if (result) alert('✅ New parts synced!');
+      else alert('ℹ️ No new parts found.');
+    }
+
+    // ================================================================
+    // PARSE PAYLOAD
+    // ================================================================
     function parseIncomingPayload(dataArray, bookId) {
       let list = [];
       for(let i = 0; i < dataArray.length; i++) {
@@ -846,11 +862,167 @@
     }
 
     // ================================================================
+    // CONTINUE READING
+    // ================================================================
+    function updateContinueReading() {
+      const card = document.getElementById('continueCard');
+      const info = document.getElementById('continueInfo');
+      const lastBookId = localStorage.getItem('last_played_book_id');
+      const lastPage = localStorage.getItem('last_played_page');
+      const lastPart = localStorage.getItem('last_played_part');
+      const lastTitle = localStorage.getItem('last_played_book_title');
+      
+      if (lastBookId && lastPage) {
+        card.style.display = 'flex';
+        info.textContent = `${lastTitle || 'Book'} - ഭാഗം ${lastPart || '1'} - പേജ് ${lastPage}`;
+      } else {
+        card.style.display = 'none';
+      }
+    }
+
+    function continueReading() {
+      const bookId = localStorage.getItem('last_played_book_id');
+      if (bookId) openBook(bookId);
+    }
+
+    // ================================================================
+    // INITIALIZATION
+    // ================================================================
+    document.addEventListener('DOMContentLoaded', async () => {
+      loadPreferences();
+      setupVoices();
+      initAudioContext();
+      
+      if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = setupVoices;
+      window.addEventListener("resize", adjustVideoScale);
+      setupMediaSession();
+      setupSwipeGestures();
+      
+      STATE.books = await loadCatalogFromDB();
+      if(STATE.books && STATE.books.length > 0) {
+        let hasParts = false;
+        for (const book of STATE.books) {
+          const chunks = await getIsolatedBookData(book.id);
+          if (chunks && chunks.length > 0) { hasParts = true; break; }
+        }
+        if (!hasParts) {
+          const firstBook = STATE.books[0];
+          await loadAllParts(firstBook);
+        }
+        renderBooks(STATE.books);
+        populateInjectorOptions();
+        document.getElementById('loader').classList.add('hidden');
+        updateContinueReading();
+      } else {
+        loadLibrary();
+      }
+    });
+
+    function setupSwipeGestures() {
+      const container = document.getElementById('readerContent');
+      container.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, {passive: true});
+      container.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        const SWIPE_THRESHOLD = 50;
+        if (touchStartX - touchEndX > SWIPE_THRESHOLD) changePage(1);
+        if (touchEndX - touchStartX > SWIPE_THRESHOLD) changePage(-1);
+      }, {passive: true});
+    }
+
+    async function loadLibrary() {
+      try {
+        const response = await fetch('books.json');
+        const data = await response.json();
+        if (data && data.length > 0) {
+          STATE.books = data;
+          await saveCatalogToDB(data);
+          const firstBook = data[0];
+          await loadAllParts(firstBook);
+          renderBooks(data);
+          populateInjectorOptions();
+          document.getElementById('loader').classList.add('hidden');
+          updateContinueReading();
+        } else { showImportScreen(); }
+      } catch (err) { showImportScreen(); }
+    }
+
+    function showImportScreen() {
+      document.getElementById('loadStatus').textContent = '📂 books.json import ചെയ്യുക';
+      document.getElementById('manualInjectControls').style.display = 'block';
+    }
+
+    function populateInjectorOptions() {
+      const select = document.getElementById('injectorTargetBookSelect');
+      if(!select) return;
+      select.innerHTML = STATE.books.map(b => `<option value="${b.id}">${b.titleMl || b.title} (${b.id})</option>`).join('');
+    }
+
+    async function handleMasterUpload(e) {
+      const file = e.target.files[0]; if (!file) return;
+      if (file.name !== 'books.json') { alert("books.json ഫയൽ മാത്രമേ upload ചെയ്യാവൂ!"); return; }
+      const text = await file.text();
+      try {
+        const parsed = JSON.parse(text);
+        STATE.books = parsed;
+        await saveCatalogToDB(parsed);
+        renderBooks(parsed);
+        populateInjectorOptions();
+        document.getElementById('loader').classList.add('hidden');
+        alert("✅ books.json synced!");
+      } catch(err) { alert("Invalid JSON file"); }
+    }
+
+    async function handleBulkPartsUpload(e) {
+      const files = e.target.files; if (!files.length) return;
+      const targetBookId = document.getElementById('injectorTargetBookSelect').value;
+      const statusText = document.getElementById('injectorStatusText');
+      statusText.innerText = "Uploading...";
+      
+      let count = 0;
+      for (let file of files) {
+        const text = await file.text();
+        try {
+          const rawData = JSON.parse(text);
+          if(rawData.length > 0) {
+            let processed = parseIncomingPayload(rawData, targetBookId);
+            let existing = await getIsolatedBookData(targetBookId);
+            let allData = [...existing, ...processed];
+            let uniqueData = [];
+            let seen = new Set();
+            for (let item of allData) {
+              if (!seen.has(item.uid)) {
+                seen.add(item.uid);
+                uniqueData.push(item);
+              }
+            }
+            await saveIsolatedBookData(uniqueData);
+            count++;
+          }
+        } catch(ex) {}
+      }
+      
+      const book = STATE.books.find(b => b.id === targetBookId);
+      if (book) {
+        const data = await getIsolatedBookData(targetBookId);
+        const maxPart = data.reduce((max, item) => Math.max(max, parseInt(item.part) || 0), 0);
+        book.parts = maxPart || 1;
+        await saveCatalogToDB(STATE.books);
+      }
+      
+      statusText.innerText = `✅ ${count} part(s) uploaded!`;
+      setTimeout(() => { statusText.innerText = ""; closeModal(); }, 2000);
+      if(STATE.currentBookId === targetBookId) openBook(targetBookId);
+      renderBooks(STATE.books);
+    }
+
+    // ================================================================
     // RENDER BOOKS
     // ================================================================
     function renderBooks(books) {
       const grid = document.getElementById('bookGrid');
-      if (!books || books.length === 0) { grid.innerHTML = `<div class="empty-state"><h3>ഗ്രന്ഥങ്ങൾ ലഭ്യമല്ല</h3></div>`; return; }
+      if (!books || books.length === 0) { grid.innerHTML = `<div class="empty-state"><h3>No books found</h3></div>`; return; }
       
       grid.innerHTML = books.map(book => `
         <div class="book-card" onclick="openBook('${book.id}')">
@@ -924,15 +1096,14 @@
       
       let localChunks = await getIsolatedBookData(bookId);
       if (localChunks && localChunks.length > 0) {
-        localChunks.sort((a, b) => a.id - b.id); compileBookCollections(localChunks, bookId);
+        localChunks.sort((a, b) => a.id - b.id);
+        compileBookCollections(localChunks, bookId);
       } else {
-        try {
-          const response = await fetch(`Books/${book.folder || bookId}/${book.folder || bookId}_part_1.json`);
-          const rawJson = await response.json();
-          let processedList = parseIncomingPayload(rawJson, bookId);
-          await saveIsolatedBookData(processedList); compileBookCollections(processedList, bookId);
-        } catch(err) { 
-          alert("ഈ പുസ്തകത്തിന്റെ ഫയലുകൾ ലഭ്യമല്ല. ഡാറ്റ ഇൻജെക്ട് ചെയ്യുക."); 
+        const data = await loadAllParts(book);
+        if (data && data.length > 0) {
+          compileBookCollections(data, bookId);
+        } else {
+          alert("ഫയലുകൾ ലഭ്യമല്ല. ദയവായി data import ചെയ്യുക."); 
           openImport();
         }
       }
@@ -940,11 +1111,9 @@
 
     function compileBookCollections(list, bookId) {
       STATE.data = list; STATE.totalPages = list.length; 
-      
       STATE.currentPage = parseInt(localStorage.getItem(bookId + '_index')) || 0;
       STATE.charOffset = parseInt(localStorage.getItem(bookId + '_offset')) || 0;
       if (STATE.currentPage >= STATE.totalPages) STATE.currentPage = 0;
-
       openReader();
     }
 
@@ -952,22 +1121,13 @@
       document.getElementById('readerView').classList.add('show');
       document.getElementById('homeView').style.display = 'none';
       document.getElementById('readerTitle').textContent = STATE.currentBook.titleMl || STATE.currentBook.title;
-      
       renderPage(); updateBookmarkUI();
-      
-      if(STATE.playing || PLAY_STATE.bookId) {
-          document.getElementById('miniPlayer').classList.add('show');
-      } else {
-          document.getElementById('miniPlayer').classList.add('show');
-      }
+      document.getElementById('miniPlayer').classList.add('show');
       switchViewportTab('ebook');
-      
-      // Resume Web Audio Context
       resumeAudioContext();
     }
 
     function closeReader() {
-      // Save last position for Continue Reading
       if (STATE.currentBookId) {
         const row = STATE.data[STATE.currentPage];
         localStorage.setItem('last_played_book_id', STATE.currentBookId);
@@ -975,14 +1135,9 @@
         localStorage.setItem('last_played_page', row?.page || '1');
         localStorage.setItem('last_played_part', row?.part || '1');
       }
-      
-      // DO NOT stop audio - let it continue playing
       document.getElementById('readerView').classList.remove('show');
       document.getElementById('homeView').style.display = 'flex';
-      
-      if(!STATE.playing) {
-          document.getElementById('miniPlayer').classList.remove('show');
-      }
+      if(!STATE.playing) document.getElementById('miniPlayer').classList.remove('show');
       closeVisualMode();
       updateContinueReading();
     }
@@ -991,7 +1146,6 @@
       if(!STATE.currentBookId) return;
       localStorage.setItem(STATE.currentBookId + '_index', STATE.currentPage);
       localStorage.setItem(STATE.currentBookId + '_offset', STATE.charOffset);
-      
       const row = STATE.data[STATE.currentPage];
       if (row) {
         localStorage.setItem('last_played_book_id', STATE.currentBookId);
@@ -1008,7 +1162,8 @@
       document.getElementById('audioView').style.display = mode === 'audio' ? 'block' : 'none';
       document.getElementById('visualView').style.display = mode === 'visual' ? 'block' : 'none';
       document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-      let activeTab = document.getElementById('nav-' + mode); if(activeTab) activeTab.classList.add('active');
+      let activeTab = document.getElementById('nav-' + mode);
+      if(activeTab) activeTab.classList.add('active');
       
       if (mode === 'visual') {
         document.getElementById('visualMode').classList.add('show');
@@ -1018,72 +1173,116 @@
         document.getElementById('visualVideo').pause();
         renderPage();
       }
-      
-      // Resume Web Audio Context
       resumeAudioContext();
     }
 
     // ================================================================
-    // RENDER PAGE
+    // RENDER PAGE - BOOK LIKE UI WITH PAGE SEPARATORS
     // ================================================================
     function renderPage() {
       if (!STATE.data || STATE.data.length === 0) return;
-      const row = STATE.data[STATE.currentPage]; if (!row) return;
-
-      let html = `<div class="head-badge"> ഭാഗം ${row.part || '?'} - പേജ് ${row.page || '?'}</div>`;
-      if (STATE.showAr && row.arStr) html += `<div class="ar-content">${row.arStr}</div>`;
-      if (STATE.showMl && row.mlStr) html += `<div class="ml-content">${highlightWords(row.mlStr)}</div>`;
-      if (STATE.showEn && row.enStr) html += `<div class="en-content">${row.enStr}</div>`;
-
-      document.getElementById('readerPageCard').innerHTML = html;
+      
+      const container = document.getElementById('readerPageContainer');
+      let html = '';
+      
+      // Show all pages with separators (book-like scroll)
+      for (let i = 0; i < STATE.data.length; i++) {
+        const row = STATE.data[i];
+        const isCurrent = (i === STATE.currentPage);
+        
+        html += `
+          <div class="reader-page-card" id="page_${i}" style="${isCurrent ? '' : 'opacity:0.7;'}">
+            <div class="head-badge">
+              <i class="fas fa-book-open"></i> ഭാഗം ${row.part || '?'} - പേജ് ${row.page || '?'}
+            </div>
+        `;
+        if (STATE.showAr && row.arStr) html += `<div class="ar-content">${row.arStr}</div>`;
+        if (STATE.showMl && row.mlStr) html += `<div class="ml-content">${highlightWords(row.mlStr, i)}</div>`;
+        if (STATE.showEn && row.enStr) html += `<div class="en-content">${row.enStr}</div>`;
+        html += `</div>`;
+        
+        // Page separator (except after last page)
+        if (i < STATE.data.length - 1) {
+          html += `
+            <div class="page-separator">
+              <span class="page-icon"><i class="fas fa-bookmark"></i> ${i + 1}</span>
+              <i class="fas fa-ellipsis-h"></i>
+              <span class="page-icon"><i class="fas fa-bookmark"></i> ${i + 2}</span>
+            </div>
+          `;
+        }
+      }
+      
+      container.innerHTML = html;
       document.getElementById('readerPageNum').textContent = `${STATE.currentPage + 1} / ${STATE.totalPages}`;
       
-      if(!STATE.playing || PLAY_STATE.bookId === STATE.currentBookId) {
-          document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
-          document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
-          updateAudioUI(); 
+      // Scroll to current page
+      setTimeout(() => {
+        const currentPageEl = document.getElementById(`page_${STATE.currentPage}`);
+        if (currentPageEl) {
+          currentPageEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      
+      // Update mini player
+      const row = STATE.data[STATE.currentPage];
+      if(row) {
+        document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
+        document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
+        updateAudioUI();
       }
       syncHighlights();
       if (document.getElementById('visualMode').classList.contains('show')) updateVisualChunk();
     }
 
-    function highlightWords(text) {
-      if (!text) return ''; let offsetAcc = 0;
+    function highlightWords(text, pageIndex) {
+      if (!text) return '';
+      let offsetAcc = 0;
+      const isCurrentPage = (pageIndex === STATE.currentPage);
+      
       return text.split(/(\s+)/).map(token => {
         if(token.trim() === "") { offsetAcc += token.length; return token; }
-        let span = `<span class="word-token" id="eb_w_${offsetAcc}" onclick="touchSeek(${offsetAcc})">${token}</span>`;
-        offsetAcc += token.length; return span;
+        const spanId = `eb_w_${pageIndex}_${offsetAcc}`;
+        let span = `<span class="word-token" id="${spanId}" onclick="touchSeek(${pageIndex}, ${offsetAcc})">${token}</span>`;
+        offsetAcc += token.length;
+        return span;
       }).join('');
     }
 
-    function touchSeek(offset) {
-      if(!STATE.touchSpeak) return; 
-      STATE.charOffset = offset; saveState(); 
+    function touchSeek(pageIndex, offset) {
+      if(!STATE.touchSpeak) return;
+      STATE.currentPage = pageIndex;
+      STATE.charOffset = offset;
+      saveState();
+      renderPage();
       
       if(PLAY_STATE.bookId === STATE.currentBookId) {
-          PLAY_STATE.charOffset = offset;
-          if(STATE.playing) { synth.cancel(); playAudioLine(); }
-          else { togglePlay(); }
+        PLAY_STATE.page = pageIndex;
+        PLAY_STATE.charOffset = offset;
+        if(STATE.playing) { synth.cancel(); playAudioLine(); }
+        else { togglePlay(); }
       } else {
-          togglePlay();
+        togglePlay();
       }
     }
 
     function changePage(delta) {
-      const newPage = STATE.currentPage + delta; if (newPage < 0 || newPage >= STATE.totalPages) return;
-      STATE.currentPage = newPage; STATE.charOffset = 0; saveState();
-      renderPage(); document.getElementById('readerContent').scrollTop = 0;
+      const newPage = STATE.currentPage + delta;
+      if (newPage < 0 || newPage >= STATE.totalPages) return;
+      STATE.currentPage = newPage;
+      STATE.charOffset = 0;
+      saveState();
+      renderPage();
       
       if (STATE.playing && PLAY_STATE.bookId === STATE.currentBookId) {
-          PLAY_STATE.page = STATE.currentPage;
-          PLAY_STATE.charOffset = 0;
-          playAudioLine();
+        PLAY_STATE.page = STATE.currentPage;
+        PLAY_STATE.charOffset = 0;
+        playAudioLine();
       }
     }
 
     // ================================================================
-    // PERSISTENT BACKGROUND TTS ENGINE (Edge Browser Optimized)
-    // Web Audio API keeps the audio context alive
+    // TTS ENGINE
     // ================================================================
     function setupVoices() {
       systemVoices = synth.getVoices();
@@ -1096,9 +1295,7 @@
     }
 
     function togglePlay() {
-      // Resume Web Audio Context on play
       resumeAudioContext();
-      
       if (STATE.playing) {
         synth.pause(); STATE.playing = false; updatePlayIcon();
         document.getElementById('silentAudio').pause(); 
@@ -1123,8 +1320,6 @@
       if(!PLAY_STATE.data || PLAY_STATE.data.length === 0) return;
       const row = PLAY_STATE.data[PLAY_STATE.page]; if (!row) return;
       const audioLangSetting = document.getElementById("optAudioLang").value;
-      
-      // Resume Web Audio Context
       resumeAudioContext();
       
       let fullText = row.mlStr;
@@ -1133,18 +1328,18 @@
       else if (audioLangSetting === "ar-EG") fullText = row.arPure;
 
       if (!fullText) { 
-          if (STATE.autoNext && PLAY_STATE.page < PLAY_STATE.totalPages - 1) { 
-              PLAY_STATE.page++; PLAY_STATE.charOffset = 0; playAudioLine(); 
-          } 
-          return; 
+        if (STATE.autoNext && PLAY_STATE.page < PLAY_STATE.totalPages - 1) { 
+          PLAY_STATE.page++; PLAY_STATE.charOffset = 0; playAudioLine(); 
+        } 
+        return; 
       }
       
       let playableText = fullText.substring(PLAY_STATE.charOffset);
       if (playableText.trim() === "") { 
-          if (STATE.autoNext && PLAY_STATE.page < PLAY_STATE.totalPages - 1) { 
-              PLAY_STATE.page++; PLAY_STATE.charOffset = 0; playAudioLine(); 
-          }
-          return; 
+        if (STATE.autoNext && PLAY_STATE.page < PLAY_STATE.totalPages - 1) { 
+          PLAY_STATE.page++; PLAY_STATE.charOffset = 0; playAudioLine(); 
+        }
+        return; 
       }
 
       synth.cancel();
@@ -1163,10 +1358,10 @@
       audioProgressInterval = setInterval(() => {
         progress += 0.5; if (progress > 100) progress = 0;
         if (STATE.mode === 'audio' && STATE.currentBookId === PLAY_STATE.bookId) {
-             document.getElementById('audioProgressBar').style.width = progress + '%';
+          document.getElementById('audioProgressBar').style.width = progress + '%';
         }
         if (STATE.currentBookId === PLAY_STATE.bookId) {
-             document.getElementById('visProgressBar').style.width = progress + '%';
+          document.getElementById('visProgressBar').style.width = progress + '%';
         }
       }, 100);
 
@@ -1174,10 +1369,7 @@
         document.getElementById('silentAudio').play().catch(()=>{}); 
         handleAmbient(); 
         updateMediaSessionMeta();
-        
-        // Keep Web Audio Context alive
         resumeAudioContext();
-        
         const rowData = PLAY_STATE.data[PLAY_STATE.page];
         if (rowData) {
           localStorage.setItem('last_played_book_id', PLAY_STATE.bookId);
@@ -1191,34 +1383,30 @@
       currentUtterance.onboundary = (e) => {
         if(typeof e.charIndex === 'number' && (e.name === 'word' || !e.name)) {
           PLAY_STATE.charOffset = baseCharOffset + e.charIndex; 
-          
           if(STATE.currentBookId === PLAY_STATE.bookId && STATE.currentPage === PLAY_STATE.page) {
-              STATE.charOffset = PLAY_STATE.charOffset;
-              saveState();
-              syncHighlights(); 
-              updateVisualChunk();
+            STATE.charOffset = PLAY_STATE.charOffset;
+            saveState();
+            syncHighlights(); 
+            updateVisualChunk();
           }
-          
-          document.getElementById('miniTitle').textContent = (row.mlPure || '').substring(0, 40) + '...';
-          document.getElementById('miniProgress').textContent = `ഭാഗം ${row.part} - പേജ് ${row.page}`;
         }
       };
 
       currentUtterance.onend = () => {
         if (STATE.playing && STATE.autoNext && PLAY_STATE.page === currentPageOnStart) {
-            PLAY_STATE.page++;
-            PLAY_STATE.charOffset = 0;
-            if(PLAY_STATE.page < PLAY_STATE.totalPages) {
-                if(STATE.currentBookId === PLAY_STATE.bookId) {
-                    STATE.currentPage = PLAY_STATE.page;
-                    STATE.charOffset = 0;
-                    saveState();
-                    renderPage();
-                }
-                playAudioLine();
-            } else {
-                stopAudio();
+          PLAY_STATE.page++;
+          PLAY_STATE.charOffset = 0;
+          if(PLAY_STATE.page < PLAY_STATE.totalPages) {
+            if(STATE.currentBookId === PLAY_STATE.bookId) {
+              STATE.currentPage = PLAY_STATE.page;
+              STATE.charOffset = 0;
+              saveState();
+              renderPage();
             }
+            playAudioLine();
+          } else {
+            stopAudio();
+          }
         }
       };
       synth.speak(currentUtterance);
@@ -1233,9 +1421,8 @@
       document.getElementById('silentAudio').pause(); 
       handleAmbient(); 
       syncHighlights();
-      
       if(document.getElementById('homeView').style.display !== 'none') {
-         document.getElementById('miniPlayer').classList.remove('show');
+        document.getElementById('miniPlayer').classList.remove('show');
       }
     }
 
@@ -1248,16 +1435,16 @@
 
     function restorePlayingBook() {
       if(PLAY_STATE.bookId && PLAY_STATE.bookId !== STATE.currentBookId) {
-          openBook(PLAY_STATE.bookId).then(() => {
-             STATE.currentPage = PLAY_STATE.page;
-             STATE.charOffset = PLAY_STATE.charOffset;
-             saveState();
-             renderPage();
-             switchViewportTab('audio');
-          });
-      } else {
-          openReader();
+        openBook(PLAY_STATE.bookId).then(() => {
+          STATE.currentPage = PLAY_STATE.page;
+          STATE.charOffset = PLAY_STATE.charOffset;
+          saveState();
+          renderPage();
           switchViewportTab('audio');
+        });
+      } else {
+        openReader();
+        switchViewportTab('audio');
       }
     }
 
@@ -1267,14 +1454,22 @@
       document.querySelectorAll(".word-token").forEach(el => el.classList.remove('word-hl'));
       if(STATE.playing && (STATE.currentBookId !== PLAY_STATE.bookId || STATE.currentPage !== PLAY_STATE.page)) return;
       
-      let spans = document.querySelectorAll(".word-token"); let targetSpan = null;
       let effectiveOffset = (STATE.playing && STATE.currentBookId === PLAY_STATE.bookId) ? PLAY_STATE.charOffset : STATE.charOffset;
+      let targetSpan = null;
+      let spans = document.querySelectorAll(`#page_${STATE.currentPage} .word-token`);
       
       for(let i=spans.length-1; i>=0; i--) {
-        let spanOffset = parseInt(spans[i].id.replace('eb_w_', ''));
+        let spanOffset = parseInt(spans[i].id.replace(`eb_w_${STATE.currentPage}_`, ''));
         if(spanOffset <= effectiveOffset) { targetSpan = spans[i]; break; }
       }
       if(targetSpan) targetSpan.classList.add('word-hl');
+      
+      // Auto-scroll to highlighted word
+      if (targetSpan) {
+        setTimeout(() => {
+          targetSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
     }
 
     function updateAudioUI() {
@@ -1295,9 +1490,23 @@
 
     function closeVisualMode() {
       document.getElementById('visualMode').classList.remove('show');
+      document.getElementById('visualMode').classList.remove('fullscreen');
       document.getElementById('visualVideo').pause();
       document.getElementById('visualYoutube').src = '';
       renderPage();
+    }
+
+    function toggleVisualFullscreen() {
+      const mode = document.getElementById('visualMode');
+      if (!document.fullscreenElement) {
+        mode.requestFullscreen?.() || mode.webkitRequestFullscreen?.();
+        mode.classList.add('fullscreen');
+        STATE.isFullscreen = true;
+      } else {
+        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        mode.classList.remove('fullscreen');
+        STATE.isFullscreen = false;
+      }
     }
 
     function updateVisualChunk() {
@@ -1315,20 +1524,26 @@
 
     function generateVisualWords(pureString, isCurrentAudioLang) {
       if(!pureString) return "...";
-      let tokens = pureString.split(/(\s+)/); let activeTokenIdx = 0; let acc = 0;
+      let tokens = pureString.split(/(\s+)/);
+      let activeTokenIdx = 0;
+      let acc = 0;
       let effectiveOffset = PLAY_STATE.charOffset;
       
       for(let i=0; i<tokens.length; i++) {
-        if(acc <= effectiveOffset) activeTokenIdx = i; else break;
+        if(acc <= effectiveOffset) activeTokenIdx = i;
+        else break;
         acc += tokens[i].length;
       }
-      let html = ""; acc = 0;
+      
+      let html = "";
+      acc = 0;
       tokens.forEach((token, idx) => {
         let isWord = token.trim() !== "";
         let isHighlight = isCurrentAudioLang && (acc <= effectiveOffset && acc + token.length > effectiveOffset) && isWord;
         let hlClass = isHighlight ? "word-hl" : "";
         if(Math.abs(idx - activeTokenIdx) <= 6) {
-          if(isWord) html += `<span class="word-token ${hlClass}">${token}</span>`; else html += token;
+          if(isWord) html += `<span class="word-token ${hlClass}">${token}</span>`;
+          else html += token;
         }
         acc += token.length;
       });
@@ -1358,7 +1573,8 @@
 
     function extractYoutubeId(url) {
       let regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      let match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : url;
+      let match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : url;
     }
 
     function adjustVideoScale() {
@@ -1387,32 +1603,33 @@
       STATE.data.forEach((row, index) => {
         let partName = row.part || "1";
         if (!currentPart || currentPart.name !== partName) {
-            currentPart = { type: 'part', name: partName, title: `ഭാഗം (Part) ${partName}`, children: [], index: index, page: row.page };
-            tocTree.push(currentPart);
-            currentH1 = null; currentH2 = null;
+          currentPart = { type: 'part', name: partName, title: `ഭാഗം (Part) ${partName}`, children: [], index: index, page: row.page };
+          tocTree.push(currentPart);
+          currentH1 = null; currentH2 = null;
         }
 
         if (row.isHead) {
-            let trMlText = row.mlPure ? row.mlPure.substring(0, 10) : "";
-            let trEnText = row.enPure ? row.enPure.substring(0, 10) : "";
-            let subtitle = (trMlText || trEnText) ? `[ ${trMlText} / ${trEnText} ]` : "";
-            let node = { type: row.hTagLevel, title: row.headingAr, subtitle: subtitle, index: index, children: [], page: row.page, raw: row };
-            
-            if (row.hTagLevel === 'h1') {
-                currentH1 = node; currentPart.children.push(currentH1); currentH2 = null;
-            } else if (row.hTagLevel === 'h2') {
-                currentH2 = node;
-                if (currentH1) currentH1.children.push(currentH2); else currentPart.children.push(currentH2);
-            } else {
-                if (currentH2) currentH2.children.push(node);
-                else if (currentH1) currentH1.children.push(node);
-                else currentPart.children.push(node);
-            }
-        } else if (index % 5 === 0 || index === STATE.currentPage || index === 0 || index === STATE.data.length - 1) {
-            let node = { type: 'page', title: `വായന - പേജ് ${row.page}`, subtitle: row.mlPure.substring(0, 20) + "...", index: index, children: [], page: row.page, raw: row };
+          let trMlText = row.mlPure ? row.mlPure.substring(0, 10) : "";
+          let trEnText = row.enPure ? row.enPure.substring(0, 10) : "";
+          let subtitle = (trMlText || trEnText) ? `[ ${trMlText} / ${trEnText} ]` : "";
+          let node = { type: row.hTagLevel, title: row.headingAr, subtitle: subtitle, index: index, children: [], page: row.page, raw: row };
+          
+          if (row.hTagLevel === 'h1') {
+            currentH1 = node; currentPart.children.push(currentH1); currentH2 = null;
+          } else if (row.hTagLevel === 'h2') {
+            currentH2 = node;
+            if (currentH1) currentH1.children.push(currentH2);
+            else currentPart.children.push(currentH2);
+          } else {
             if (currentH2) currentH2.children.push(node);
             else if (currentH1) currentH1.children.push(node);
             else currentPart.children.push(node);
+          }
+        } else if (index % 5 === 0 || index === STATE.currentPage || index === 0 || index === STATE.data.length - 1) {
+          let node = { type: 'page', title: `വായന - പേജ് ${row.page}`, subtitle: row.mlPure.substring(0, 20) + "...", index: index, children: [], page: row.page, raw: row };
+          if (currentH2) currentH2.children.push(node);
+          else if (currentH1) currentH1.children.push(node);
+          else currentPart.children.push(node);
         }
       });
     }
@@ -1423,20 +1640,20 @@
       document.getElementById('tocBreadcrumb').innerHTML = breadcrumbHTML;
 
       let html = currentLevel.nodes.map((node, i) => {
-          if (node.children.length > 0) {
-              return `<div class="toc-item" onclick="drillTOC(${i})">
-                  <div class="toc-badge">${node.type.toUpperCase()}</div>
-                  <div class="toc-title-text" dir="rtl" style="text-align:right; font-size:18px; font-weight:bold; color:var(--primary-green);">${node.title}</div>
-                  ${node.subtitle ? `<div class="toc-translations" dir="ltr" style="text-align:right;">${node.subtitle}</div>` : ''}
-                  <div style="font-size:11px; color:var(--text-muted); margin-top:8px;"><i class="fas fa-folder-open"></i> ${node.children.length} ഉള്ളടക്കങ്ങൾ <i class="fas fa-chevron-right" style="float:right;"></i></div>
-              </div>`;
-          } else {
-              return `<div class="toc-item ${node.index === STATE.currentPage ? 'current' : ''}" onclick="closeModal(); jumpToPage(${node.index})">
-                  <div class="toc-badge">📄 പേജ് ${node.page}</div>
-                  <div class="toc-title-text" ${node.raw && node.raw.isHead ? 'dir="rtl" style="text-align:right;font-size:16px;font-weight:bold;"' : ''}>${node.title}</div>
-                  ${node.subtitle ? `<div class="toc-translations" dir="ltr" ${node.raw && node.raw.isHead ? 'style="text-align:right;"' : ''}>${node.subtitle}</div>` : ''}
-              </div>`;
-          }
+        if (node.children.length > 0) {
+          return `<div class="toc-item" onclick="drillTOC(${i})">
+            <div class="toc-badge">${node.type.toUpperCase()}</div>
+            <div class="toc-title-text" dir="rtl" style="text-align:right; font-size:18px; font-weight:bold; color:var(--primary-green);">${node.title}</div>
+            ${node.subtitle ? `<div class="toc-translations" dir="ltr" style="text-align:right;">${node.subtitle}</div>` : ''}
+            <div style="font-size:11px; color:var(--text-muted); margin-top:8px;"><i class="fas fa-folder-open"></i> ${node.children.length} ഉള്ളടക്കങ്ങൾ <i class="fas fa-chevron-right" style="float:right;"></i></div>
+          </div>`;
+        } else {
+          return `<div class="toc-item ${node.index === STATE.currentPage ? 'current' : ''}" onclick="closeModal(); jumpToPage(${node.index})">
+            <div class="toc-badge">📄 പേജ് ${node.page}</div>
+            <div class="toc-title-text" ${node.raw && node.raw.isHead ? 'dir="rtl" style="text-align:right;font-size:16px;font-weight:bold;"' : ''}>${node.title}</div>
+            ${node.subtitle ? `<div class="toc-translations" dir="ltr" ${node.raw && node.raw.isHead ? 'style="text-align:right;"' : ''}>${node.subtitle}</div>` : ''}
+          </div>`;
+        }
       }).join('');
       document.getElementById('tocList').innerHTML = html;
     }
@@ -1455,11 +1672,15 @@
     }
 
     function jumpToPage(index) { 
-        STATE.currentPage = index; STATE.charOffset = 0; saveState(); 
-        renderPage(); 
-        if(STATE.playing && PLAY_STATE.bookId === STATE.currentBookId) { 
-            PLAY_STATE.page = index; PLAY_STATE.charOffset = 0; playAudioLine(); 
-        } 
+      STATE.currentPage = index;
+      STATE.charOffset = 0;
+      saveState(); 
+      renderPage(); 
+      if(STATE.playing && PLAY_STATE.bookId === STATE.currentBookId) { 
+        PLAY_STATE.page = index;
+        PLAY_STATE.charOffset = 0;
+        playAudioLine(); 
+      } 
     }
 
     // ================================================================
@@ -1491,15 +1712,19 @@
     // BOOKMARKS
     // ================================================================
     function toggleBookmark() {
-      const key = STATE.currentBookId + '_bookmarks'; let bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
+      const key = STATE.currentBookId + '_bookmarks';
+      let bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
       const idx = bookmarks.indexOf(STATE.currentPage);
-      if (idx > -1) bookmarks.splice(idx, 1); else bookmarks.push(STATE.currentPage);
-      localStorage.setItem(key, JSON.stringify(bookmarks)); updateBookmarkUI();
+      if (idx > -1) bookmarks.splice(idx, 1);
+      else bookmarks.push(STATE.currentPage);
+      localStorage.setItem(key, JSON.stringify(bookmarks));
+      updateBookmarkUI();
     }
 
     function updateBookmarkUI() {
       if(!STATE.currentBookId) return;
-      const key = STATE.currentBookId + '_bookmarks'; const bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
+      const key = STATE.currentBookId + '_bookmarks';
+      const bookmarks = JSON.parse(localStorage.getItem(key) || '[]');
       document.getElementById('readerBookmark').classList.toggle('active-bm', bookmarks.includes(STATE.currentPage));
     }
 
@@ -1513,7 +1738,8 @@
     function goHome() { closeReader(); }
 
     function setTheme(theme) {
-      STATE.theme = theme; document.documentElement.setAttribute('data-theme', theme);
+      STATE.theme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('m_rb_theme', theme);
       document.querySelectorAll('.theme-btn').forEach(el => el.classList.remove('active'));
       document.getElementById('th-' + theme).classList.add('active');
@@ -1522,18 +1748,17 @@
     function applyFontSize() {
       const size = document.getElementById('optFontSize').value;
       document.documentElement.style.setProperty('--font-scale', size + 'px');
-      localStorage.setItem('m_rb_fsize', size); renderPage();
+      localStorage.setItem('m_rb_fsize', size);
+      renderPage();
     }
     
     function applyFonts() {
       const fontMl = document.getElementById('optFontMl').value;
       const fontAr = document.getElementById('optFontAr').value;
       const fontEn = document.getElementById('optFontEn').value;
-      
       document.documentElement.style.setProperty('--font-ml', fontMl);
       document.documentElement.style.setProperty('--font-ar', fontAr);
       document.documentElement.style.setProperty('--font-en', fontEn);
-      
       localStorage.setItem('pref_font_ml', fontMl);
       localStorage.setItem('pref_font_ar', fontAr);
       localStorage.setItem('pref_font_en', fontEn);
@@ -1553,7 +1778,9 @@
       
       applyFonts();
       applyFontSize();
-      STATE.showAr = true; STATE.showMl = true; STATE.showEn = true;
+      STATE.showAr = true;
+      STATE.showMl = true;
+      STATE.showEn = true;
     }
 
     function renderAllViews() {
@@ -1571,15 +1798,29 @@
     }
 
     function handleAmbient() {
-      let rain = document.getElementById("ambRain"), wind = document.getElementById("ambWind"), nasheed = document.getElementById("ambNasheed");
+      let rain = document.getElementById("ambRain");
+      let wind = document.getElementById("ambWind");
+      let nasheed = document.getElementById("ambNasheed");
+      let nasheda = document.getElementById("bgNasheda");
       let opt = document.getElementById("optAmbient").value;
-      rain.pause(); wind.pause(); nasheed.pause();
+      
+      rain.pause(); wind.pause(); nasheed.pause(); nasheda.pause();
+      
       if(STATE.playing) {
         if(opt === 'rain') rain.play().catch(()=>{});
-        if(opt === 'wind') wind.play().catch(()=>{});
-        if(opt === 'nasheed') { nasheed.volume = 0.15; nasheed.play().catch(()=>{}); }
+        else if(opt === 'wind') wind.play().catch(()=>{});
+        else if(opt === 'nasheed') { nasheed.volume = 0.15; nasheed.play().catch(()=>{}); }
+        else if(opt === 'nasheda') { nasheda.volume = 0.15; nasheda.play().catch(()=>{}); }
       }
     }
+
+    // Handle fullscreen change events
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        document.getElementById('visualMode').classList.remove('fullscreen');
+        STATE.isFullscreen = false;
+      }
+    });
   </script>
 </body>
 </html>
